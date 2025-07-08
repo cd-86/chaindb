@@ -1,0 +1,10 @@
+?*~
+\#?*#
+.#?*
+/.vscode/
+
+.DS_Store
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+?*.exe
