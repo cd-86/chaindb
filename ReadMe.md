@@ -47,17 +47,17 @@ GetLocalTxOwnedBy <owner_uuid>
 返回 `Transactions[{confirmation_score: <uint>, data: "..."}, ...]`:
 
 ```C++
-struct /* 事务类型 (名字未指定) */ {
+struct /* 事务类型 (匿名类) */ {
     std::uint confirmation_score;
     std::string data;
     // ... 其余的供内部使用的成员变量 ...
 };
-/* 返回值示例: */ std::vector</* 事务类型 (名字未指定) */>{
+return std::vector</* 事务类型 (匿名类) */>{
     {10, "Hello"},
     { 7, ", "},
     { 7, "world"},
     { 2,  "! "},
-};
+};  // 示例, 仅供参考.
 ```
 
 (在区块链网络中, `confirmation_score` 表示一条记录 (`data`) 的可信程度.
