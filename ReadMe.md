@@ -44,6 +44,21 @@ ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `owne
 GetLocalTxOwnedBy <owner_uuid>
 ```
 
-返回 `Transactions[{confirmation_score: <uint>, data: "..."}, ...]`  <br>
+返回 `Transactions[{confirmation_score: <uint>, data: "..."}, ...]`:
+
+```C++
+struct /* 事务类型 (名字未指定) */ {
+    std::uint confirmation_score;
+    std::string data;
+    // ... 其余的供内部使用的成员变量 ...
+};
+/* 返回值示例: */ std::vector</* 事务类型 (名字未指定) */>{
+    {10, "Hello"},
+    { 7, ", "},
+    { 7, "world"},
+    { 2,  "! "},
+};
+```
+
 (在区块链网络中, `confirmation_score` 表示一条记录 (`data`) 的可信程度.
  ChainDB 不提供指导, 调用方应根据实际使用环境决定 `confirmation_score` 的最低阈值.)
