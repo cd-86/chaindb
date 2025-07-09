@@ -78,3 +78,12 @@ AddTxLocally {
 `confirmations_4sync` 是一个用于控制同步时间的参数.
 数值越大, 阻塞越久, 但 transaction 被刻进区块链的概率越大;
 该值为 0 表示非阻塞调用, 你可将该值设为 0, 然后手动检查.
+
+## 构建
+
+### 配置
+
+#### Confirmation 时间
+
+设定大约多少秒增加一个 confirmation 数.
+算法会根据设定值决定区块链的延伸速度.
