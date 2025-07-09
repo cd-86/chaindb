@@ -41,7 +41,7 @@ ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `owne
 ### 查询
 
 ```
-GetLocalTxListOwnedBy <owner_uuid>
+GetLocalTxOwnedBy <owner_uuid>
 ```
 
 返回 `Transactions[{confirmation_score: <uint>, data: "..."}, ...]`  <br>
