@@ -8,8 +8,12 @@
 
 ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 owner_id 和 data.
 
-同一个 owner 会有 0 个或多个 transaction 与其关联.  <br>
+同一个 owner 会有 0 个或多个 transaction 与其关联.
 但 ChainDB 会记住 transaction 之间的先后顺序.
+
+在分布式场景下, 一条 transaction 可能未能及时同步到其它主机, 或者因为不被区块链网络认可而被丢弃.
+没有任何办法能确保一条 transaction 最终会被所有主机认可.
+你可选择等待足够久的时间, 随着时间的推移, transaction 未被成功刻进区块链的概率是指数下降的.
 
 ### 修改数据
 
