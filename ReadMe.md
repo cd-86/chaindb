@@ -38,7 +38,7 @@ ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `owne
 
 ## API
 
-### 查询
+### 读
 
 ```
 GetLocalTxOwnedBy <owner_uuid>
@@ -60,5 +60,9 @@ return std::vector</* 事务类型 (匿名类) */>{
 };  // 示例, 仅供参考.
 ```
 
-(在区块链网络中, `confirmation_score` 表示一条记录 (`data`) 的可信程度.
- ChainDB 不提供指导, 调用方应根据实际使用环境决定 `confirmation_score` 的最低阈值.)
+字段 `confirmation_score` 表示一条记录 (`data`) 的可信程度,
+ChainDB 不提供指导, 用户应根据实际使用环境决定 `confirmation_score` 的最低阈值.
+这是 Bitcoin 的真实情况, ChainDB 遵循了 Bitcoin 的设计.
+
+### 写
+
