@@ -15,7 +15,7 @@ ChainDB 进程退出后, 本地数据全部丢失.
 
 ### 存储数据的最小单元
 
-ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 owner_uuid 和 data.
+ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `owner_uuid` 和 `data`.
 
 同一个 owner 会有 0 个或多个 transaction 与其关联.
 但 ChainDB 会记住 transaction 之间的先后顺序.
