@@ -86,4 +86,4 @@ AddTxLocally {
 #### Confirmation 时间
 
 设定大约多少秒增加一个 confirmation 数.
-算法会根据设定值决定区块链的延伸速度.
+算法会根据设定值影响区块链的延伸速度.
