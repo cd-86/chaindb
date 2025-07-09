@@ -48,7 +48,7 @@ GetLocalTxOwnedBy <owner_uuid>
 
 ```C++
 struct /* 事务类型 (匿名类) */ {
-    std::uint confirmation_score;
+    std::uint64_t confirmation_score;
     std::string data;
     // ... 其余的供内部使用的成员变量 ...
 };
