@@ -2,48 +2,35 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/hashicorp/mdns"
 )
 
 func publish() {
-	// Setup our service export
-	host, _ := os.Hostname()
-	fmt.Println("host 名字:", host)
-
 	service, _ := mdns.NewMDNSService(
-		host, "_foobar._tcp", "", "", 8000, nil,
-		[]string{"My awesome service"},
+		"叫啥名字应该无所谓吧", "ChainDB.Discovery", "", "", 8000, nil,
+		nil,
 	)
 
 	// Create the mDNS server, defer shutdown
-	mdns.NewServer(&mdns.Config{Zone: service})
+	mdns.NewServer(&mdns.Config{Zone: service, LogEmptyResponses: true})
 	// defer server.Shutdown()
-	time.Sleep(100 * time.Second)
 }
 func lookup() {
 	// Make a channel for results and start listening
 	entriesCh := make(chan *mdns.ServiceEntry, 4)
 	go func() {
 		for entry := range entriesCh {
-			fmt.Printf("Got new entry: %v\n", entry)
+			fmt.Printf("!!! %v\n", entry.AddrV4)
 		}
 	}()
 
-	// Start the lookup
-	qparams := mdns.DefaultParams("_foobar._tcp")
-	qparams.Entries = entriesCh
-	qparams.Timeout = 5 * time.Second
-	qparams.DisableIPv6 = true
-	mdns.Query(qparams)
-	time.Sleep(100 * time.Second)
+	mdns.Lookup("ChainDB.Discovery", entriesCh)
 }
 
 func main() {
-	go publish()
-	time.Sleep(time.Second)
-	go lookup()
-	time.Sleep(5 * time.Second)
+	publish()
+	lookup()
+	time.Sleep(3 * time.Second)
 }
