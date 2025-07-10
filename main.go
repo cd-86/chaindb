@@ -2,38 +2,49 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"time"
-
-	"github.com/hashicorp/mdns"
 )
 
-func publish() {
-	service, _ := mdns.NewMDNSService(
-		"叫啥名字应该无所谓吧", "shynur.ChainDB.Discovery", "", "", 8000, nil,
-		[]string{"Fuck!!!!"},
-	)
+func s() {
+	addr := net.UDPAddr{
+		IP:   net.IPv4(255, 255, 255, 255),
+		Port: 8888,
+	}
+	conn, err := net.DialUDP("udp", nil, &addr)
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
 
-	// Create the mDNS server, defer shutdown
-	mdns.NewServer(&mdns.Config{Zone: service, LogEmptyResponses: true})
-	// defer server.Shutdown()
+	for {
+		conn.Write([]byte("hello, this is a broadcast"))
+		time.Sleep(time.Second * 5)
+	}
+
 }
-func lookup() {
-	// Make a channel for results and start listening
-	entriesCh := make(chan *mdns.ServiceEntry, 4)
-	go func() {
-		for entry := range entriesCh {
-			fmt.Printf("!!! %v\n", entry)
+func r() {
+	addr := net.UDPAddr{
+		IP:   net.IPv4(0, 0, 0, 0),
+		Port: 8888,
+	}
+	conn, err := net.ListenUDP("udp", &addr)
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
+
+	buf := make([]byte, 1024)
+	for {
+		n, senderAddr, err := conn.ReadFromUDP(buf)
+		if err != nil {
+			continue
 		}
-	}()
-
-	params := mdns.DefaultParams("shynur.ChainDB.Discovery")
-	params.Entries = entriesCh
-	params.Timeout = 10 * time.Second
-	mdns.Query(params)
+		fmt.Printf("From %s: %s\n", senderAddr.IP.String(), string(buf[:n]))
+	}
 }
-
 func main() {
-	publish()
-	lookup()
+	go s()
+	go r()
 	time.Sleep(10 * time.Second)
 }
