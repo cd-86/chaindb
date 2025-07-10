@@ -8,3 +8,4 @@
 $RECYCLE.BIN/
 
 ?*.exe
+/chaindb  # 在根目录下 'go build' 生成的二进制文件.
