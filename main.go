@@ -19,7 +19,7 @@ func s() {
 
 	for {
 		conn.Write([]byte("hello, this is a broadcast"))
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 1)
 	}
 
 }
@@ -45,6 +45,6 @@ func r() {
 }
 func main() {
 	go s()
-	go r()
+	//go r()
 	time.Sleep(10 * time.Second)
 }
