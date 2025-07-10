@@ -1,6 +1,8 @@
 # ChainDB: 基于区块链的 可信任网络下 键值存储型 内存数据库
 
-## 目标
+## 介绍
+
+### 目标
 
 启动 ChainDB.
 如果可以连接到其它设备, 加入到由那些设备组成的区块链网络中;
@@ -11,6 +13,11 @@ ChainDB 进程退出后, 本地数据全部丢失.
 ⚠ 不建议 **在 ChainDB 运行期间** 切换 Wi-Fi,
 可能会导致新 Wi-Fi 网络下的其它设备的数据被本设备的数据覆盖!
 
+### 局限性
+
+ChainDB 不支持回调监听.
+这是区块链本身的局限性.
+
 ## 概念
 
 ### 存储数据的最小单元
@@ -19,10 +26,6 @@ ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `owne
 
 同一个 owner 会有 0 个或多个 transaction 与其关联.
 但 ChainDB 会记住 transaction 之间的先后顺序.
-
-在分布式场景下, 一条 transaction 可能未能及时同步到其它主机, 或者因为不被区块链网络认可而被丢弃.
-没有任何办法能确保一条 transaction 最终会被所有主机认可.
-你可选择等待足够久的时间, 随着时间的推移, transaction 未被成功刻进区块链的概率是指数下降的.
 
 ### 修改数据
 
@@ -36,9 +39,48 @@ ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `owne
 
 ⚠ ChainDB 不关注 data 的具体内容, 如何组织 data 由用户自己决定!
 
+### Confirmation Score
+
+在分布式场景下, 一条 transaction 可能未能及时同步到其它所有主机, 或者最终因为不被区块链网络认可而被丢弃.
+没有任何办法能确保一条 transaction 最终会被所有主机认可.
+
+你可选择等待足够久的时间.
+如果一条 transaction 一直存在于本地 ChainDB, 未被其主动丢弃,
+那么随着时间的推移, 该 transaction 未被成功刻进区块链的概率是 **指数下降的**.
+
+反映一条 transaction 同步程度的指标是 `confirmation_score`.
+分数越高, 该 transaction 刻录失败的概率越低.
+
+ChainDB 不提供指导, 用户应根据实际使用环境决定 `confirmation_score` 的最低阈值.
+这是 比特币 交易的真实情况, ChainDB 遵循了 比特币 的设计.
+
 ## API
 
 ### 读
+
+#### 列出 Owner
+
+```
+GetLocalOwners
+```
+
+返回 `Owners[{confirmation_score: <uint>, owner_uuid: <uint>}, ...]`:
+
+```C++
+struct /* Owner (匿名类) */ {
+    std::uint64_t confirmation_score;
+    std::uint64_t owner_uuid;
+    // ... 其余的供内部使用的成员变量 ...
+};
+return std::vector</* Owner (匿名类) */>{
+    {10, 0x65416},
+    { 7, 0xFF464},
+    { 7, 0x4154A},
+    { 2, 0x1A4F6},
+};  // 示例, 仅供参考.
+```
+
+#### 查询具体数据
 
 ```
 GetLocalTxOwnedBy <owner_uuid>
@@ -59,10 +101,6 @@ return std::vector</* 事务类型 (匿名类) */>{
     { 2,  "! "},
 };  // 示例, 仅供参考.
 ```
-
-字段 `confirmation_score` 表示一条记录 (`data`) 的可信程度,
-ChainDB 不提供指导, 用户应根据实际使用环境决定 `confirmation_score` 的最低阈值.
-这是 Bitcoin 的真实情况, ChainDB 遵循了 Bitcoin 的设计.
 
 ### 写
 
