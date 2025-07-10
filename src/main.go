@@ -9,7 +9,7 @@ import (
 
 func publish() {
 	service, _ := mdns.NewMDNSService(
-		"叫啥名字应该无所谓吧", "ChainDB.Discovery", "", "", 8000, nil,
+		"叫啥名字应该无所谓吧", "shynur.ChainDB.Discovery", "", "", 8000, nil,
 		nil,
 	)
 
@@ -26,11 +26,11 @@ func lookup() {
 		}
 	}()
 
-	mdns.Lookup("ChainDB.Discovery", entriesCh)
+	mdns.Lookup("shynur.ChainDB.Discovery", entriesCh)
 }
 
 func main() {
-	publish()
+	//publish()
 	lookup()
 	time.Sleep(3 * time.Second)
 }
