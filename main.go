@@ -10,7 +10,7 @@ import (
 func publish() {
 	service, _ := mdns.NewMDNSService(
 		"叫啥名字应该无所谓吧", "shynur.ChainDB.Discovery", "", "", 8000, nil,
-		nil,
+		[]string{"Fuck!!!!"},
 	)
 
 	// Create the mDNS server, defer shutdown
@@ -22,15 +22,18 @@ func lookup() {
 	entriesCh := make(chan *mdns.ServiceEntry, 4)
 	go func() {
 		for entry := range entriesCh {
-			fmt.Printf("!!! %v\n", entry.AddrV4)
+			fmt.Printf("!!! %v\n", entry)
 		}
 	}()
 
-	mdns.Lookup("shynur.ChainDB.Discovery", entriesCh)
+	params := mdns.DefaultParams("shynur.ChainDB.Discovery")
+	params.Entries = entriesCh
+	params.Timeout = 10 * time.Second
+	mdns.Query(params)
 }
 
 func main() {
 	publish()
 	lookup()
-	time.Sleep(3 * time.Second)
+	time.Sleep(10 * time.Second)
 }
