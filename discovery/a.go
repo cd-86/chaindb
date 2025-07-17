@@ -21,7 +21,7 @@ func FindAll(wait_time time.Duration) {
 			if entry.Instance == UniqueNodeName {
 				continue
 			}
-			log.Println(entry)
+			log.Printf("%+v\n", entry)
 		}
 		log.Println("No more entries.")
 	}(entries)
