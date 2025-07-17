@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"time"
 
 	"github.com/grandcat/zeroconf"
@@ -13,8 +14,8 @@ import (
 // var ActiveNodes []net.IP  // 不包括自己.
 var UniqueNodeName = fmt.Sprintf("ChainDB-No%d", time.Now().UnixMilli())
 
-func FindAll(wait_time time.Duration) {
-	//discovered_nodes := []net.IP{}
+func FindAll(timeout time.Duration) {
+	discovered_nodes := []net.IP{}
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(results <-chan *zeroconf.ServiceEntry) {
 		for entry := range results {
@@ -22,20 +23,12 @@ func FindAll(wait_time time.Duration) {
 				continue
 			}
 			log.Printf("%+v\n", entry)
+			// addresses = entry.AddrIPv4 + entry.AddrIPv6
 		}
 		log.Println("No more entries.")
 	}(entries)
 
-	ctx, cancel := context.WithTimeout(
-		context.Background(),
-		func() time.Duration {
-			if wait_time == 0 {
-				return chaindb.BlockTime
-			} else {
-				return wait_time
-			}
-		}(),
-	)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	resolver, err := zeroconf.NewResolver(nil)
@@ -54,9 +47,31 @@ func Register() {
 	_, err := zeroconf.Register(
 		UniqueNodeName,
 		"_shynur-chaindb._tcp", "local.", chaindb.DNSSDPort,
-		nil, nil,
+		nil, []net.Interface{getOneMulticastNetworkInterface()},
 	)
 	if err != nil {
 		panic(err)
 	}
+}
+
+// 改编自 <https://github.com/grandcat/zeroconf/blob/e4f60f8407b11e9ba16f4c4c5ad24226dd4e8519/connection.go#L101>.
+func getOneMulticastNetworkInterface() net.Interface {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, ifi := range ifaces {
+		if ifi.Flags&net.FlagUp == 0 {
+			continue
+		}
+		if ifi.Flags&net.FlagMulticast == 0 {
+			continue
+		}
+		if ifi.Flags&net.FlagLoopback > 0 {
+			continue
+		}
+		return ifi
+	}
+	panic("No suitable multicast interface found")
 }
