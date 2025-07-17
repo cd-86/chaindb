@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/grandcat/zeroconf"
-	"github.com/shynur/chaindb/chaindb"
+	"github.com/shynur/chaindb"
 )
 
 //var ActiveNodes []net.IP

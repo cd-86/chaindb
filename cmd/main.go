@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/shynur/chaindb/chaindb/discovery"
+	"github.com/shynur/chaindb/discovery"
 )
 
 func main() {
