@@ -4,9 +4,13 @@ go 1.24.5
 
 require github.com/hashicorp/mdns v1.0.6
 
-require github.com/pion/logging v0.2.2 // indirect
+require (
+	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
+	github.com/pion/logging v0.2.2 // indirect
+)
 
 require (
+	github.com/grandcat/zeroconf v1.0.0
 	github.com/miekg/dns v1.1.55 // indirect
 	github.com/pion/mdns/v2 v2.0.7
 	golang.org/x/mod v0.17.0 // indirect
