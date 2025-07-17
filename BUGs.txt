@@ -1,1 +1,0 @@
-hashicorp/mdns 在 Windows 上用不了, 即使禁掉了 IPv6.
