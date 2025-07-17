@@ -10,13 +10,17 @@ import (
 	"github.com/shynur/chaindb"
 )
 
-//var ActiveNodes []net.IP
+// var ActiveNodes []net.IP  // 不包括自己.
+var UniqueNodeName = fmt.Sprintf("ChainDB-No%d", time.Now().UnixMilli())
 
 func FindAll(wait_time time.Duration) {
 	//discovered_nodes := []net.IP{}
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(results <-chan *zeroconf.ServiceEntry) {
 		for entry := range results {
+			if entry.Instance == UniqueNodeName {
+				continue
+			}
 			log.Println(entry)
 		}
 		log.Println("No more entries.")
@@ -48,7 +52,7 @@ func FindAll(wait_time time.Duration) {
 
 func Register() {
 	_, err := zeroconf.Register(
-		fmt.Sprintf("ChainDB-No%d", time.Now().UnixMilli()),
+		UniqueNodeName,
 		"_shynur-chaindb._tcp", "local.", chaindb.DNSSDPort,
 		nil, nil,
 	)
