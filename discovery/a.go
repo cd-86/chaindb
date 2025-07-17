@@ -15,7 +15,7 @@ import (
 var UniqueNodeName = fmt.Sprintf("ChainDB-No%d", time.Now().UnixMilli())
 
 func FindAll(timeout time.Duration) {
-	discovered_nodes := []net.IP{}
+	//discovered_nodes := []net.IP{}
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(results <-chan *zeroconf.ServiceEntry) {
 		for entry := range results {
