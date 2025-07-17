@@ -15,7 +15,7 @@ import (
 var UniqueNodeName = fmt.Sprintf("ChainDB-No%d", time.Now().UnixMilli())
 
 func FindAll(timeout time.Duration) {
-	//discovered_nodes := []net.IP{}
+	discovered_nodes := []net.IP{}
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(results <-chan *zeroconf.ServiceEntry) {
 		for entry := range results {
@@ -23,7 +23,13 @@ func FindAll(timeout time.Duration) {
 				continue
 			}
 			log.Printf("%+v\n", entry)
-			// addresses = entry.AddrIPv4 + entry.AddrIPv6
+			if len(entry.AddrIPv4) > 0 {
+				discovered_nodes = append(discovered_nodes, entry.AddrIPv4[0])
+			} else if len(entry.AddrIPv6) > 0 {
+				discovered_nodes = append(discovered_nodes, entry.AddrIPv6[0])
+			} else {
+				panic("No IP address found in received DNS-SD entry")
+			}
 		}
 		log.Println("No more entries.")
 	}(entries)
