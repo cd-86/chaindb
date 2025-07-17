@@ -1,0 +1,9 @@
+{
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "editor.tabSize": 8,
+    "editor.detectIndentation": false,
+    "files.eol": "\n",
+    "files.encoding": "utf8",
+}
