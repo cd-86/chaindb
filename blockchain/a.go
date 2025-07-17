@@ -1,10 +1,9 @@
 package blockchain
 
 type Transaction struct {
-	Timestamp float64 `json:"Timestamp"`
-	OwnerID   uint32  `json:"OwnerID"`
-	Nonce     uint32  `json:"Nonce"`
-	Data      string  `json:"Data"`
+	OwnerID uint32 `json:"OwnerID"`
+	Nonce   uint32 `json:"Nonce"`
+	Data    string `json:"Data"`
 }
 
 type Block struct {
