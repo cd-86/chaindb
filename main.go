@@ -2,49 +2,42 @@ package main
 
 import (
 	"fmt"
-	"net"
+	"os"
 	"time"
+
+	"github.com/hashicorp/mdns"
 )
 
 func s() {
-	addr := net.UDPAddr{
-		IP:   net.IPv4(255, 255, 255, 255),
-		Port: 8888,
-	}
-	conn, err := net.DialUDP("udp", nil, &addr)
-	if err != nil {
-		panic(err)
-	}
-	defer conn.Close()
+	// Setup our service export
+	host, _ := os.Hostname()
+	info := []string{"My awesome service"}
+	service, _ := mdns.NewMDNSService(host, "_foobar._tcp", "", "", 8000, nil, info)
 
-	for {
-		conn.Write([]byte("hello, this is a broadcast"))
-		time.Sleep(time.Second * 1)
-	}
-
+	// Create the mDNS server, defer shutdown
+	server, _ := mdns.NewServer(&mdns.Config{Zone: service})
+	defer server.Shutdown()
+	time.Sleep(10 * time.Second)
 }
 func r() {
-	addr := net.UDPAddr{
-		IP:   net.IPv4(0, 0, 0, 0),
-		Port: 8888,
-	}
-	conn, err := net.ListenUDP("udp", &addr)
-	if err != nil {
-		panic(err)
-	}
-	defer conn.Close()
-
-	buf := make([]byte, 1024)
-	for {
-		n, senderAddr, err := conn.ReadFromUDP(buf)
-		if err != nil {
-			continue
+	// Make a channel for results and start listening
+	entriesCh := make(chan *mdns.ServiceEntry, 4)
+	go func() {
+		for entry := range entriesCh {
+			fmt.Printf("!!! Got new entry: %v\n", entry)
 		}
-		fmt.Printf("From %s: %s\n", senderAddr.IP.String(), string(buf[:n]))
-	}
+	}()
+
+	// Start the lookup
+	params := mdns.DefaultParams("_foobar._tcp")
+	params.Entries = entriesCh
+	params.DisableIPv6 = true
+	params.Timeout = 5 * time.Second
+	mdns.Query(params)
+	close(entriesCh)
 }
 func main() {
 	go s()
-	//go r()
-	time.Sleep(10 * time.Second)
+	go r()
+	time.Sleep(5 * time.Second)
 }
