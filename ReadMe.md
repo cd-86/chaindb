@@ -122,6 +122,8 @@ AddTxLocally {
 
 - [x] 节点间相互发现
   - [x] 自动更新活跃节点的 IP 地址列表
+    - [x] 基于 mDNS 的 Service Discovery
+    - [ ] 连通性测试
   - [ ] 网络环境测试
     - [ ] 切换网络
     - [ ] 断网重连
