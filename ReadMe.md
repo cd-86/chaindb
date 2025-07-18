@@ -7,36 +7,38 @@
 启动 ChainDB.
 如果可以连接到其它设备, 加入到由那些设备组成的区块链网络中;
 否则, 自己生成一个单一矿工节点的区块链网络.
+(设备 A 与设备 B 连接, 设备 B 与设备 C 连接, 则 A 与 C 可以间接连接.)
 
 ChainDB 进程退出后, 本地数据全部丢失.
+只要加入到区块链网络, 即可同步数据, 因此现场可用笔记本电脑作为节点接入网络定期拉取数据库.
 
-⚠ 不建议 **在 ChainDB 运行期间** 切换 Wi-Fi,
-可能会导致新 Wi-Fi 网络下的其它设备的数据被本设备的数据覆盖!
+⚠ **不建议在 ChainDB 运行期间切换 Wi-Fi**,
+可能会导致新 Wi-Fi 网络下的其它设备的数据被本设备的数据覆盖.
 
 ### 局限性
 
-ChainDB 暂不支持回调监听.
+- 暂不支持回调监听.
+- 暂不支持持久化存储 (可在业务层实现).
 
 ## 概念
 
 ### 存储数据的最小单元
 
-ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `owner_uuid` 和 `data`.
+ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `OwnerUUID` (key) 和 `Data` (value).
 
 同一个 owner 会有 0 个或多个 transaction 与其关联.
 但 ChainDB 会记住 transaction 之间的先后顺序.
 
 ### 修改数据
 
-区块链被认为是不可变的 (ChainDB 可能会主动丢弃某条 transaction, 但不会修改它),
-但你仍然有办法 (在逻辑上) 修改 owner 所持有的 data.
+区块链被认为是不可变的, 只能追加数据.
+逻辑上讲, 追加数据可以理解为修改数据的一种方式.
 
-例如, 对于 owner_uuid=42,
-假设 ChainDB 中已经有一条与其关联的 transaction, 你可再插入一条 patch
-`{"owner_uuid": 42, "data": "追加一个字符 'A'"}`, 同属于 owner_uuid=42 的一系列 data 可以按照
-原始数据 + patches 的方式合并起来.
+例如, 对于 `OwnerUUID=42`,
+假设 ChainDB 中已经有一条与其关联的 transaction, 你可继续插入
+`{"OwnerUUID": 42, "Data": "追加一个字符 'A'"}`.
 
-⚠ ChainDB 不关注 data 的具体内容, 如何组织 data 由用户自己决定!
+当查询 `OwnerUUID=42` 时, 会按追加顺序返回所有 transaction.
 
 ### Confirmation Score
 
@@ -47,10 +49,10 @@ ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `owne
 如果一条 transaction 一直存在于本地 ChainDB, 未被其主动丢弃,
 那么随着时间的推移, 该 transaction 未被成功刻进区块链的概率是 **指数下降的**.
 
-反映一条 transaction 同步程度的指标是 `confirmation_score`.
+反映一条 transaction 同步程度的指标是 `ConfirmationScore`.
 分数越高, 该 transaction 刻录失败的概率越低.
 
-ChainDB 不提供指导, 用户应根据实际使用环境决定 `confirmation_score` 的最低阈值.
+ChainDB 不提供指导, 用户应根据实际使用环境决定 `ConfirmationScore` 的最低阈值.
 这是 比特币 交易的真实情况, ChainDB 遵循了 比特币 的设计.
 
 ## API
@@ -89,7 +91,7 @@ GetLocalTxOwnedBy <owner_uuid>
 
 ```C++
 struct /* 事务类型 (匿名类) */ {
-    std::uint64_t confirmation_score;
+    std::uint64_t confirmation.._score;
     std::string data;
     // ... 其余的供内部使用的成员变量 ...
 };
@@ -116,11 +118,23 @@ AddTxLocally {
 数值越大, 阻塞越久, 但 transaction 被刻进区块链的概率越大;
 该值为 0 表示非阻塞调用, 你可将该值设为 0, 然后手动检查.
 
-## 构建
+## 进度
 
-### 配置
-
-#### Confirmation 时间
-
-设定大约多少秒增加一个 confirmation 数.
-算法会根据设定值影响区块链的延伸速度.
+- [x] 节点间相互发现
+  - [x] 自动更新活跃节点的 IP 地址列表
+  - [ ] 网络环境测试
+    - [ ] 切换网络
+    - [ ] 断网重连
+- [ ] 区块链网络数据同步 (HTTP 或 gRPC)
+  - [ ] 广播自身链长
+  - [ ] 请求其它节点的区块
+    - [ ] 请求
+    - [ ] 响应
+- [x] 数据结构设计
+  - [x] 单条数据
+  - [x] 区块
+  - [ ] 链表
+  - [ ] 矿池
+- [ ] 查询 API
+  - [ ] 添加订单 (HTTP)
+  - [ ] 查询订单 (HTTP)
