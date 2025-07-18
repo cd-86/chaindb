@@ -7,7 +7,7 @@ import (
 )
 
 func ping(ip string) (err error) {
-	switch os := runtime.GOOS; os {
+	switch OS := runtime.GOOS; OS {
 	case "windows":
 		err = exec.Command("ping", "-n", "1", ip).Run()
 	case "linux":
@@ -16,7 +16,7 @@ func ping(ip string) (err error) {
 		panic(
 			fmt.Sprintf(
 				"平台 OS (%s) 上的 `ping' 暂时没有得到 ChainDB 的支持",
-				os,
+				OS,
 			),
 		)
 	}
