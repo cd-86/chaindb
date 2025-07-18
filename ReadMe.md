@@ -1,5 +1,7 @@
 # ChainDB: 基于区块链的 可信任网络下 键值存储型 内存数据库
 
+![代码行数统计徽章](https://sloc.xyz/github/shynur/chaindb?category=code&lower=true)
+
 ## 介绍
 
 ### 目标
@@ -69,8 +71,8 @@ GetLocalOwners
 
 ```C++
 struct /* Owner (匿名类) */ {
-    std::uint64_t confirmation_score;
-    std::uint64_t owner_uuid;
+    std::uint32_t ConfirmationScore;
+    std::uint32_t OwnerID;
     // ... 其余的供内部使用的成员变量 ...
 };
 return std::vector</* Owner (匿名类) */>{
@@ -87,12 +89,12 @@ return std::vector</* Owner (匿名类) */>{
 GetLocalTxOwnedBy <owner_uuid>
 ```
 
-返回 `Transactions[{confirmation_score: <uint>, data: "..."}, ...]`:
+返回 `Transactions[{ConfirmationScore: <uint>, Data: "..."}, ...]`:
 
 ```C++
 struct /* 事务类型 (匿名类) */ {
-    std::uint64_t confirmation.._score;
-    std::string data;
+    std::uint32_t ConfirmationScore;
+    std::string Data;
     // ... 其余的供内部使用的成员变量 ...
 };
 return std::vector</* 事务类型 (匿名类) */>{
@@ -107,14 +109,14 @@ return std::vector</* 事务类型 (匿名类) */>{
 
 ```
 AddTxLocally {
-    required_confirmation_score: <uint>,
-    transaction: {user_uuid: <uint>, data: "..."}
+    RequiredConfirmationScore: <uint>,
+    Transaction: {OwnerID: <uint>, Data: "..."}
 }
 ```
 
 向本地 ChainDB 添加一条 transaction, 随后它可能会被整个区块链网络接受.
 
-此处 `required_confirmation_score` 是一个用于控制同步时间的参数.
+此处 `RequiredConfirmationScore` 是一个用于控制同步时间的参数.
 数值越大, 阻塞越久, 但 transaction 被刻进区块链的概率越大;
 该值为 0 表示非阻塞调用, 你可将该值设为 0, 然后手动检查.
 

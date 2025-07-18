@@ -7,7 +7,7 @@ go run ./cmd
 ### 编译
 
 ```bash
-go build -o chaindbd.exe ./cmd
+go build -o chaindb.exe ./cmd
 ```
 
 ### 单元测试
