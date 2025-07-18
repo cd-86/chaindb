@@ -120,6 +120,8 @@ AddTxLocally {
 
 ## 进度
 
+- [x] 基础功能
+  - [x] ChainDB 实现进程互斥, 一台设备上同一时间只允许一个 ChainDB 实例运行
 - [x] 节点间相互发现
   - [x] 自动更新活跃节点的 IP 地址列表
     - [x] 基于 mDNS 的 Service Discovery

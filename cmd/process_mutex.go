@@ -59,6 +59,9 @@ func assertNoOtherChainDBInstance() {
 		panic(err)
 	}
 	for _, other_pid_file := range pid_files {
+		if !strings.HasSuffix(other_pid_file.Name(), ".pid") {
+			continue
+		}
 		pid, _ := strconv.Atoi(strings.TrimSuffix(other_pid_file.Name(), ".pid"))
 		if pid == os.Getpid() {
 			continue
