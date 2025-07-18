@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"runtime"
 	"slices"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -23,17 +24,32 @@ var ActiveNodes = func() *atomic.Pointer[[]net.IP] {
 
 var UniqueNodeName = fmt.Sprintf("ChainDB-No%d", time.Now().UnixMilli())
 
-func FindAll(timeout time.Duration) (discovered_nodes []net.IP) {
+func FindAll(timeout time.Duration) []net.IP {
+	var (
+		nodes_list_lock  sync.Mutex
+		discovered_nodes []net.IP
+	)
+
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(results <-chan *zeroconf.ServiceEntry) {
 		for entry := range results {
 			if entry.Instance == UniqueNodeName {
 				continue
 			}
-			log.Printf("%+v\n", entry)
+
+			var has_been_added atomic.Bool
 			for _, addr := range append(entry.AddrIPv4, entry.AddrIPv6...) {
-				//net.D
-				discovered_nodes = append(discovered_nodes, addr)
+				go func() {
+					if err := ping(addr.String()); err != nil {
+						return
+					}
+					if has_been_added.CompareAndSwap(false, true) {
+						nodes_list_lock.Lock()
+						defer nodes_list_lock.Unlock()
+						discovered_nodes = append(discovered_nodes, addr)
+						log.Printf("已发现 %s\n", addr)
+					}
+				}()
 			}
 		}
 	}(entries)
@@ -51,6 +67,10 @@ func FindAll(timeout time.Duration) (discovered_nodes []net.IP) {
 	}
 
 	<-ctx.Done()
+
+	nodes_list_lock.Lock()
+	defer nodes_list_lock.Unlock()
+	return discovered_nodes
 }
 
 // INTERVAL: 网络环境中检查各类事项的间隔时间或超时时间.

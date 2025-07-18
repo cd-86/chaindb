@@ -7,11 +7,6 @@ import (
 )
 
 func main() {
-	/* for _, iface := range discovery.GetOneMulticastNetworkInterface() {
-		fmt.Println(
-			iface.MulticastAddrs(),
-		)
-	} */
-	discovery.Register()
+	discovery.Register(10 * time.Second)
 	discovery.FindAll(5 * time.Second)
 }
