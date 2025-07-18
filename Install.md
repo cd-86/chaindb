@@ -9,3 +9,9 @@ go run ./cmd
 ```bash
 go build -o chaindbd.exe ./cmd
 ```
+
+### 单元测试
+
+```bash
+go test ./discovery
+```
