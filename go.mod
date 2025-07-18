@@ -14,7 +14,6 @@ require (
 )
 
 require (
-	github.com/gofrs/flock v0.12.1
 	github.com/grandcat/zeroconf v1.0.0
 	github.com/miekg/dns v1.1.55 // indirect
 	github.com/shirou/gopsutil/v4 v4.25.6
