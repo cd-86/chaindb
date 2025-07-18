@@ -7,10 +7,8 @@ type Chain struct {
 	lock   sync.RWMutex
 }
 
-func NewChain() *Chain {
-	var chain Chain
-	chain.blocks = []Block{
-		//TODO {Timestamp: }
-	}
-	return &chain
+var LocalChain = Chain{
+	blocks: []Block{
+		{ /* 创世区块 */ },
+	},
 }
