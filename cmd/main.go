@@ -1,12 +1,15 @@
 package main
 
 import (
-	"time"
+	"fmt"
 
 	"github.com/shynur/chaindb/discovery"
 )
 
 func main() {
-	discovery.Register()
-	discovery.FindAll(10 * time.Second)
+	for _, iface := range discovery.GetOneMulticastNetworkInterface() {
+		fmt.Println(
+			iface,
+		)
+	}
 }
