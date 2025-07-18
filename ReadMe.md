@@ -65,7 +65,7 @@ ChainDB 不提供指导, 用户应根据实际使用环境决定 `ConfirmationSc
 GetLocalOwners
 ```
 
-返回 `Owners[{confirmation_score: <uint>, owner_uuid: <uint>}, ...]`:
+返回 `Owners[{ConfirmationScore: <uint>, OwnerID: <uint>}, ...]`:
 
 ```C++
 struct /* Owner (匿名类) */ {
