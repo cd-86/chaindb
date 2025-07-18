@@ -60,7 +60,7 @@ func Register() {
 	_, err := zeroconf.Register(
 		UniqueNodeName,
 		"_shynur-chaindb._tcp", "local.", chaindb.DNSSDPort,
-		nil, nil  // []net.Interface{getOneMulticastNetworkInterface()},
+		nil, nil, // []net.Interface{getOneMulticastNetworkInterface()},
 	)
 	if err != nil {
 		panic(err)
