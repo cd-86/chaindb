@@ -15,7 +15,7 @@ func GetOneMulticastNetworkInterface() (interfaces []net.Interface) {
 		if ifi.Flags&net.FlagMulticast == 0 {
 			continue
 		}
-		if ifi.Flags&net.FlagLoopback > 0 {
+		if ifi.Flags&net.FlagLoopback != 0 {
 			continue
 		}
 		interfaces = append(interfaces, ifi)

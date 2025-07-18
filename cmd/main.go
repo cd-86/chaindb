@@ -9,7 +9,7 @@ import (
 func main() {
 	for _, iface := range discovery.GetOneMulticastNetworkInterface() {
 		fmt.Println(
-			iface,
+			iface.MulticastAddrs(),
 		)
 	}
 }
