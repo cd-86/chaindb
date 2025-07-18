@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os/exec"
+	"runtime"
 	"sync/atomic"
 	"time"
 
@@ -29,12 +31,9 @@ func FindAll(timeout time.Duration) {
 				continue
 			}
 			log.Printf("%+v\n", entry)
-			if len(entry.AddrIPv4) > 0 {
-				discovered_nodes = append(discovered_nodes, entry.AddrIPv4[0])
-			} else if len(entry.AddrIPv6) > 0 {
-				discovered_nodes = append(discovered_nodes, entry.AddrIPv6[0])
-			} else {
-				panic("No IP address found in received DNS-SD entry")
+			for _, addr := range append(entry.AddrIPv4, entry.AddrIPv6...) {
+				//net.D
+				discovered_nodes = append(discovered_nodes, addr)
 			}
 		}
 		log.Println("No more entries.")
@@ -60,20 +59,22 @@ func Register() {
 	_, err := zeroconf.Register(
 		UniqueNodeName,
 		"_shynur-chaindb._tcp", "local.", chaindb.DNSSDPort,
-		nil, getOneMulticastNetworkInterface(),
+		nil, getMulticastNetworkInterfaces(),
 	)
 	if err != nil {
 		panic(err)
 	}
 }
 
-// 改编自 <https://github.com/grandcat/zeroconf/blob/e4f60f8407b11e9ba16f4c4c5ad24226dd4e8519/connection.go#L101>.
-func getOneMulticastNetworkInterface() (ifaces []net.Interface) {
+// (改编自 <https://github.com/grandcat/zeroconf/blob/e4f60f8407b11e9ba16f4c4c5ad24226dd4e8519/connection.go#L101>.)
+// 可能有多个, 包括接入的虚拟局域网.
+func getMulticastNetworkInterfaces() []net.Interface {
 	all_ifaces, err := net.Interfaces()
 	if err != nil {
 		panic(err)
 	}
 
+	ifaces := []net.Interface{}
 	for _, ifi := range all_ifaces {
 		if ifi.Flags&net.FlagUp == 0 {
 			continue
@@ -87,5 +88,30 @@ func getOneMulticastNetworkInterface() (ifaces []net.Interface) {
 		ifaces = append(ifaces, ifi)
 	}
 
+	return ifaces
+}
+
+func ping(ip string) (err error) {
+	switch os := runtime.GOOS; os {
+	case "windows":
+		err = exec.Command("ping", "-n", "1", ip).Run()
+	case "linux":
+		err = exec.Command("ping", "-c", "1", ip).Run()
+	default:
+		panic(
+			fmt.Sprintf(
+				"平台 OS (%s) 上的 `ping' 暂时没有得到 ChainDB 的支持",
+				os,
+			),
+		)
+	}
+
+	if err != nil {
+		if _, ok := err.(*exec.ExitError); ok {
+			return
+		} else {
+			panic("`exec ping' 失败")
+		}
+	}
 	return
 }
