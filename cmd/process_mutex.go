@@ -9,6 +9,8 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+
+	psutil_proc "github.com/shirou/gopsutil/v4/process"
 )
 
 func assertNoOtherChainDBInstance() {
@@ -34,11 +36,23 @@ func assertNoOtherChainDBInstance() {
 	if err := os.MkdirAll(filepath.Dir(pid_file_path), 0777); err != nil {
 		panic(err)
 	}
-	pid_file, err := os.Create(pid_file_path)
-	if err != nil {
-		panic(err)
-	}
-	pid_file.Close()
+	func() {
+		pid_file, err := os.Create(pid_file_path)
+		if err != nil {
+			panic(err)
+		} else {
+			defer pid_file.Close()
+		}
+		ps_proc, err := psutil_proc.NewProcess(int32(os.Getpid()))
+		if err != nil {
+			panic(err)
+		}
+		cmdline, err := ps_proc.Cmdline()
+		if err != nil {
+			panic(err)
+		}
+		pid_file.WriteString(cmdline)
+	}()
 
 	pid_files, err := os.ReadDir(filepath.Dir(pid_file_path))
 	if err != nil {
@@ -46,10 +60,31 @@ func assertNoOtherChainDBInstance() {
 	}
 	for _, other_pid_file := range pid_files {
 		pid, _ := strconv.Atoi(strings.TrimSuffix(other_pid_file.Name(), ".pid"))
-		fmt.Println(pid)
-	}
+		if pid == os.Getpid() {
+			continue
+		}
 
-	if true {
+		other_pid_file_path := filepath.Join(filepath.Dir(pid_file_path), other_pid_file.Name())
+
+		other_proc, err := psutil_proc.NewProcess(int32(pid))
+		if err != nil {
+			os.Remove(other_pid_file_path)
+			continue
+		}
+
+		cmdline_in_file, err := os.ReadFile(other_pid_file_path)
+		if err != nil {
+			panic(err)
+		}
+		cmdline_of_proc, err := other_proc.Cmdline()
+		if err != nil {
+			panic(err)
+		}
+		if string(cmdline_in_file) != cmdline_of_proc {
+			os.Remove(other_pid_file_path)
+			continue
+		}
+
 		fmt.Fprintf(os.Stderr, "本机上有其它 ChainDB 进行在运行\n")
 		os.Exit(1)
 	}
