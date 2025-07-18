@@ -33,6 +33,9 @@ func FindAll(timeout time.Duration) []net.IP {
 					continue
 				}
 				go func() {
+					if has_been_added.Load() {
+						return
+					}
 					if err := ping(addr.String()); err != nil {
 						return
 					}
