@@ -1,24 +1,24 @@
 name: Go Test
 
 on:
-	push:
-		branches: [trunk]
-	pull_request:
+  push:
+    branches: [trunk]
+  pull_request:
 
 jobs:
-	test:
-		runs-on: ${{ matrix.os }}
-		strategy:
-			matrix:
-				os: [ubuntu-latest, windows-latest]
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
-		steps:
-			- uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-			- name: Set up Go
-				uses: actions/setup-go@v5
-				with:
-					go-version: 'stable'
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
 
-			- name: Run Tests
-				run: go test ./discovery
+      - name: Run Tests
+        run: go test ./discovery
