@@ -27,7 +27,7 @@ func FindAll(timeout time.Duration) []net.IP {
 			var has_been_added atomic.Bool
 			for _, addr := range append(
 				entry.AddrIPv4,
-				// entry.AddrIPv6...,  // 路由器可能不支持 IPv6 吧...
+				// entry.AddrIPv6...,  // 路由器可能不支持 IPv6 吧, 主要是我不确定 'IPv6:port' 咋正确书写.
 			) {
 				if isLocalIP(addr) {
 					continue
