@@ -7,18 +7,18 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-
-	"github.com/gofrs/flock"
+	"strconv"
+	"strings"
 )
 
 func assertNoOtherChainDBInstance() {
-	lock_path := filepath.Join(
+	pid_file_path := filepath.Join(
 		func() string {
 			switch OS := runtime.GOOS; OS {
 			case "windows":
 				return `C:\ProgramData`
 			case "linux":
-				return "/var/lock"
+				return "/tmp"
 			default:
 				panic(
 					fmt.Sprintf(
@@ -28,26 +28,28 @@ func assertNoOtherChainDBInstance() {
 				)
 			}
 		}(),
-		"shynur", "app", "chaindb", "proc-mutex.lock",
+		"shynur", "app", "chaindb", "proc-mutex",
+		fmt.Sprintf("%d.pid", os.Getpid()),
 	)
-	if err := os.MkdirAll(filepath.Dir(lock_path), 0777); err != nil {
+	if err := os.MkdirAll(filepath.Dir(pid_file_path), 0777); err != nil {
 		panic(err)
 	}
-
-	ok, err := flock.New(lock_path).TryLock()
-	if err != nil {
-		lock_file, err := os.OpenFile(lock_path, os.O_CREATE, 0666)
-		if err != nil {
-			panic(err)
-		}
-		lock_file.Close()
-		ok, err = flock.New(lock_path).TryLock()
-	}
-
+	pid_file, err := os.Create(pid_file_path)
 	if err != nil {
 		panic(err)
 	}
-	if !ok {
+	pid_file.Close()
+
+	pid_files, err := os.ReadDir(filepath.Dir(pid_file_path))
+	if err != nil {
+		panic(err)
+	}
+	for _, other_pid_file := range pid_files {
+		pid, _ := strconv.Atoi(strings.TrimSuffix(other_pid_file.Name(), ".pid"))
+		fmt.Println(pid)
+	}
+
+	if true {
 		fmt.Fprintf(os.Stderr, "本机上有其它 ChainDB 进行在运行\n")
 		os.Exit(1)
 	}
