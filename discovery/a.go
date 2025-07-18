@@ -8,7 +8,9 @@ import (
 func Start(interval time.Duration) {
 	Register(interval)
 	go func() {
-		nodes := FindAll(interval)
-		ActiveNodes.Store(&nodes)
+		for {
+			nodes := FindAll(interval)
+			ActiveNodes.Store(&nodes)
+		}
 	}()
 }
