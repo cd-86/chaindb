@@ -60,7 +60,7 @@ func Register() {
 	_, err := zeroconf.Register(
 		UniqueNodeName,
 		"_shynur-chaindb._tcp", "local.", chaindb.DNSSDPort,
-		nil, nil, // []net.Interface{getOneMulticastNetworkInterface()},
+		nil, getOneMulticastNetworkInterface(),
 	)
 	if err != nil {
 		panic(err)
@@ -68,13 +68,13 @@ func Register() {
 }
 
 // 改编自 <https://github.com/grandcat/zeroconf/blob/e4f60f8407b11e9ba16f4c4c5ad24226dd4e8519/connection.go#L101>.
-func getOneMulticastNetworkInterface() net.Interface {
-	ifaces, err := net.Interfaces()
+func getOneMulticastNetworkInterface() (ifaces []net.Interface) {
+	all_ifaces, err := net.Interfaces()
 	if err != nil {
 		panic(err)
 	}
 
-	for _, ifi := range ifaces {
+	for _, ifi := range all_ifaces {
 		if ifi.Flags&net.FlagUp == 0 {
 			continue
 		}
@@ -84,7 +84,8 @@ func getOneMulticastNetworkInterface() net.Interface {
 		if ifi.Flags&net.FlagLoopback != 0 {
 			continue
 		}
-		return ifi
+		ifaces = append(ifaces, ifi)
 	}
-	panic("No suitable multicast interface found")
+
+	return
 }
