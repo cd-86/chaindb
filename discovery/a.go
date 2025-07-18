@@ -7,6 +7,7 @@ import (
 	"net"
 	"os/exec"
 	"runtime"
+	"slices"
 	"sync/atomic"
 	"time"
 
@@ -22,8 +23,7 @@ var ActiveNodes = func() *atomic.Pointer[[]net.IP] {
 
 var UniqueNodeName = fmt.Sprintf("ChainDB-No%d", time.Now().UnixMilli())
 
-func FindAll(timeout time.Duration) {
-	discovered_nodes := []net.IP{}
+func FindAll(timeout time.Duration) (discovered_nodes []net.IP) {
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(results <-chan *zeroconf.ServiceEntry) {
 		for entry := range results {
@@ -36,7 +36,6 @@ func FindAll(timeout time.Duration) {
 				discovered_nodes = append(discovered_nodes, addr)
 			}
 		}
-		log.Println("No more entries.")
 	}(entries)
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
@@ -52,18 +51,71 @@ func FindAll(timeout time.Duration) {
 	}
 
 	<-ctx.Done()
-	ActiveNodes.Store(&discovered_nodes)
 }
 
-func Register() {
-	_, err := zeroconf.Register(
-		UniqueNodeName,
-		"_shynur-chaindb._tcp", "local.", chaindb.DNSSDPort,
-		nil, getMulticastNetworkInterfaces(),
-	)
-	if err != nil {
-		panic(err)
+// INTERVAL: 网络环境中检查各类事项的间隔时间或超时时间.
+func Start(interval time.Duration) {
+	Register(interval)
+	go func() {
+		nodes := FindAll(interval)
+		ActiveNodes.Store(&nodes)
+	}()
+}
+
+func Register(interval_checking_network time.Duration) {
+	ifcs := []net.Interface{}
+	ifaces_is_equal := func(ifs1, ifs2 []net.Interface) bool {
+		if len(ifs1) != len(ifs2) {
+			return false
+		}
+		for _, iface1 := range ifs1 {
+			if !slices.ContainsFunc(
+				ifs2,
+				func(iface2 net.Interface) bool {
+					if iface1.Index != iface2.Index {
+						return false
+					}
+					if iface1.MTU != iface2.MTU {
+						return false
+					}
+					if iface1.Name != iface2.Name {
+						return false
+					}
+					if iface1.HardwareAddr.String() != iface2.HardwareAddr.String() {
+						return false
+					}
+					if iface1.Flags != iface2.Flags {
+						return false
+					}
+					return true
+				},
+			) {
+				return false
+			}
+		}
+		return true
 	}
+
+	var server *zeroconf.Server
+	go func() {
+		for ; ; time.Sleep(interval_checking_network) {
+			new_ifcs := getMulticastNetworkInterfaces()
+			if ifaces_is_equal(ifcs, new_ifcs) {
+				continue
+			}
+
+			if server != nil {
+				server.Shutdown()
+			}
+			server, _ = zeroconf.Register(
+				UniqueNodeName,
+				"_shynur-chaindb._tcp", "local.", chaindb.DNSSDPort,
+				nil, new_ifcs,
+			)
+
+			ifcs = new_ifcs
+		}
+	}()
 }
 
 // (改编自 <https://github.com/grandcat/zeroconf/blob/e4f60f8407b11e9ba16f4c4c5ad24226dd4e8519/connection.go#L101>.)
