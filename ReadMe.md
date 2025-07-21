@@ -1,6 +1,6 @@
 # ChainDB: 基于区块链的 可信任网络下 键值存储型 内存数据库
 
-![代码行数统计徽章](https://sloc.xyz/github/shynur/chaindb?category=code&lower=true)
+![代码行数统计徽章](https://sloc.xyz/github/shynur/chaindb/?category=code&lower=true)
 ![可成功构建的徽章](https://github.com/shynur/chaindb/actions/workflows/go-build.yaml/badge.svg)
 ![通过测试的徽章](https://github.com/shynur/chaindb/actions/workflows/go-test.yaml/badge.svg)
 

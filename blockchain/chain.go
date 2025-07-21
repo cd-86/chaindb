@@ -1,14 +1,12 @@
 package blockchain
 
 import (
-	"container/list"
 	"sync"
 )
 
 type Chain struct {
-	blocks  []Block
-	lock    sync.RWMutex
-	TxQueue list.List
+	blocks []Block
+	lock   sync.RWMutex
 }
 
 func New() *Chain {
