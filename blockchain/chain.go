@@ -24,10 +24,12 @@ func New() *Chain {
 	}
 }
 
-func (chain *Chain) avgBlkTime() time.Duration {
-	chain.lock.RLock()
-	defer chain.lock.RUnlock()
+// 有可能被加入到新区块所记录的交易列表中.
+func (chain *Chain) validNewTx(tx Transaction) bool {
+	return tx.Nonce >= uint32(len(chain.getTxOwnedBy(tx.OwnerID)))
+}
 
+func (chain *Chain) avgBlkTime() time.Duration {
 	if num_blocks := len(chain.blocks); num_blocks == 0 {
 		log.Fatalln("区块链的长度应当永远是正数才对, 默认有创世区块")
 		return 0 // stupid gc
@@ -48,7 +50,7 @@ func (chain *Chain) avgBlkTime() time.Duration {
 	}
 }
 
-func (chain *Chain) GetOwners() (
+func (chain *Chain) GetOwners_sync() (
 	owners []struct {
 		OwnerID           uint32 `json:"OwnerID"`
 		ConfirmationScore uint32 `json:"ConfirmationScore"`
@@ -77,7 +79,7 @@ func (chain *Chain) GetOwners() (
 	return owners
 }
 
-func (chain *Chain) GetTxOwnedBy(owner_id uint32) (
+func (chain *Chain) GetTxOwnedBy_sync(owner_id uint32) (
 	transactions []struct {
 		ConfirmationScore uint32 `json:"ConfirmationScore"`
 		Data              string `json:"Data"`
@@ -85,7 +87,15 @@ func (chain *Chain) GetTxOwnedBy(owner_id uint32) (
 ) {
 	chain.lock.RLock()
 	defer chain.lock.RUnlock()
+	return chain.getTxOwnedBy(owner_id)
+}
 
+func (chain *Chain) getTxOwnedBy(owner_id uint32) (
+	transactions []struct {
+		ConfirmationScore uint32 `json:"ConfirmationScore"`
+		Data              string `json:"Data"`
+	},
+) {
 	for i, block := range chain.blocks {
 		for _, tx := range block.Transactions {
 			if tx.OwnerID == owner_id {
