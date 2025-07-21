@@ -8,4 +8,4 @@ cp -r . /tmp/shynur/chaindb.git
 
 cd /tmp/shynur/chaindb.git
 git remote set-url origin https://cnb.cool/shynur/chaindb.git
-git push
+git push -f

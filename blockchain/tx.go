@@ -11,18 +11,22 @@ type Transaction struct {
 	Data    string `json:"Data"`
 }
 
-type TxQueue struct {
+type TxPool struct {
 	transactions *list.List
 	lock         sync.RWMutex
 }
 
-func (q *TxQueue) Enqueue(tx Transaction) {
+var LocalTxPool = TxPool{
+	transactions: list.New(),
+}
+
+func (q *TxPool) Enqueue(tx Transaction) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 	q.transactions.PushBack(tx)
 }
 
-func (q *TxQueue) Remove(tx *list.Element) {
+func (q *TxPool) Remove(tx *list.Element) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 	q.transactions.Remove(tx)

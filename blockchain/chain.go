@@ -9,7 +9,7 @@ type Chain struct {
 	lock   sync.RWMutex
 }
 
-var TheChain = Chain{
+var LocalChain = Chain{
 	blocks: []Block{
 		{ /* the Genesis Block */ },
 	},
