@@ -16,13 +16,13 @@ func NewTxPool() *TxPool {
 	}
 }
 
-func (q *TxPool) Enqueue(tx Transaction) {
+func (q *TxPool) Enqueue_sync(tx Transaction) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 	q.transactions.PushBack(tx)
 }
 
-func (q *TxPool) Remove(tx *list.Element) {
+func (q *TxPool) Remove_sync(tx *list.Element) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 	q.transactions.Remove(tx)

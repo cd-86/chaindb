@@ -25,7 +25,7 @@ func New() *Chain {
 }
 
 // 有可能被加入到新区块所记录的交易列表中.
-func (chain *Chain) validNewTx(tx Transaction) bool {
+func (chain *Chain) maybeValidNewTx(tx Transaction) bool {
 	return tx.Nonce >= uint32(len(chain.getTxOwnedBy(tx.OwnerID)))
 }
 
