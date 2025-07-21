@@ -7,7 +7,7 @@ func TestPing(t *testing.T) {
 		"127.0.0.1",
 		"localhost",
 		"::1",
-		// "bing.com",  有些环境下可能无法访问.
+		"example.org",
 	}
 	ip_addresses_unreachable := []string{
 		"10.0.0.0", "10.255.255.255",
