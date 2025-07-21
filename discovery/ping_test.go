@@ -7,7 +7,7 @@ func TestPing(t *testing.T) {
 		"127.0.0.1",
 		"localhost",
 		"::1",
-		"github.com",
+		// "example.org",  // GitHub Actions 上可能无法访问.
 	}
 	ip_addresses_unreachable := []string{
 		"10.0.0.0", "10.255.255.255",
