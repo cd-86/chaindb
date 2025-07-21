@@ -1,9 +1,7 @@
 package blockchain
 
 import (
-	"math/rand/v2"
 	"slices"
-	"time"
 
 	chaindb_config "github.com/shynur/chaindb/config"
 )
@@ -40,14 +38,15 @@ func BuildBlockThenAppend_sync(chain *Chain, tx_pool *TxPool) {
 			},
 		)
 	}
-
-	blk := Block{
-		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
-		UUID:      rand.Uint32(),
-		ParentUUID: func() Block {
-			chain.lock.RLock()
-			defer chain.lock.RUnlock()
-			return chain.blocks[len(chain.blocks)-1]
-		}().UUID,
-	}
+	/*
+		blk := Block{
+			Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
+			UUID:      rand.Uint32(),
+			ParentUUID: func() Block {
+				chain.lock.RLock()
+				defer chain.lock.RUnlock()
+				return chain.blocks[len(chain.blocks)-1]
+			}().UUID,
+		}
+	*/
 }
