@@ -1,7 +1,9 @@
 package blockchain
 
-import "github.com/shynur/chaindb"
+import (
+	chaindb_config "github.com/shynur/chaindb/config"
+)
 
 func StartMining(chain *Chain, tx_pool *TxPool) {
-	const blk_time = chaindb.BlockTime
+	const blk_time = chaindb_config.BlockTime
 }

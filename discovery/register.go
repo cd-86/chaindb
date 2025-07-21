@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/grandcat/zeroconf"
-	"github.com/shynur/chaindb"
+	chaindb_config "github.com/shynur/chaindb/config"
 )
 
 func Register(interval_checking_network time.Duration) {
@@ -56,7 +56,7 @@ func Register(interval_checking_network time.Duration) {
 			}
 			server, _ = zeroconf.Register(
 				UniqueNodeName,
-				"_shynur-chaindb._tcp", "local.", chaindb.DNSSDPort,
+				"_shynur-chaindb._tcp", "local.", chaindb_config.DNSSDPort,
 				nil, new_ifcs,
 			)
 

@@ -1,7 +1,11 @@
 package blockchain
 
 import (
+	"log"
 	"sync"
+	"time"
+
+	chaindb_config "github.com/shynur/chaindb/config"
 )
 
 type Chain struct {
@@ -9,10 +13,36 @@ type Chain struct {
 	lock   sync.RWMutex
 }
 
-var LocalChain = Chain{
-	blocks: []Block{
-		{ /* the Genesis Block */ },
-	},
+func New() *Chain {
+	the_genesis_block := Block{
+		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
+	}
+	return &Chain{
+		blocks: []Block{
+			the_genesis_block,
+		},
+	}
+}
+
+func (chain *Chain) avgBlkTime() time.Duration {
+	chain.lock.RLock()
+	defer chain.lock.RUnlock()
+
+	if num_blocks := len(chain.blocks); num_blocks == 0 {
+		log.Fatalln("区块链的长度应当永远是正数才对, 默认有创世区块")
+	} else if num_blocks == 1 {
+		return chaindb_config.BlockTime
+	} else if num_blocks <= 6 {
+		return time.Duration(
+			(chain.blocks[num_blocks-1].Timestamp - chain.blocks[0].Timestamp) /
+				float64(num_blocks-1),
+		)
+	} else {
+		return time.Duration(
+			(chain.blocks[num_blocks-1].Timestamp - chain.blocks[num_blocks-6].Timestamp) /
+				5.0,
+		)
+	}
 }
 
 func (chain *Chain) GetOwners() (
