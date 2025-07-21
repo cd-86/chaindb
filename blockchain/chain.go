@@ -34,12 +34,14 @@ func (chain *Chain) avgBlkTime() time.Duration {
 		return chaindb_config.BlockTime
 	} else if num_blocks <= 6 {
 		return time.Duration(
-			(chain.blocks[num_blocks-1].Timestamp - chain.blocks[0].Timestamp) /
+			(chain.blocks[num_blocks-1].getSeenTimestamp() -
+				chain.blocks[0].getSeenTimestamp()) /
 				float64(num_blocks-1),
 		)
 	} else {
 		return time.Duration(
-			(chain.blocks[num_blocks-1].Timestamp - chain.blocks[num_blocks-6].Timestamp) /
+			(chain.blocks[num_blocks-1].getSeenTimestamp() -
+				chain.blocks[num_blocks-6].getSeenTimestamp()) /
 				5.0,
 		)
 	}

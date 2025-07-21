@@ -28,7 +28,7 @@ ChainDB 进程退出后, 本地数据全部丢失.
 
 ### 存储数据的最小单元
 
-ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `OwnerUUID` (key) 和 `Data` (value).
+ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `OwnerID` (key) 和 `Data` (value).
 
 同一个 owner 会有 0 个或多个 transaction 与其关联.
 但 ChainDB 会记住 transaction 之间的先后顺序.
@@ -38,11 +38,11 @@ ChainDB 中存储一系列 transaction (事务), 每条 transaction 存储 `Owne
 区块链被认为是不可变的, 只能追加数据.
 逻辑上讲, 追加数据可以理解为修改数据的一种方式.
 
-例如, 对于 `OwnerUUID=42`,
+例如, 对于 `OwnerID=42`,
 假设 ChainDB 中已经有一条与其关联的 transaction, 你可继续插入
-`{"OwnerUUID": 42, "Data": "追加一个字符 'A'"}`.
+`{"OwnerID": 42, "Data": "追加一个字符 'A'"}`.
 
-当查询 `OwnerUUID=42` 时, 会按追加顺序返回所有 transaction.
+当查询 `OwnerID=42` 时, 会按追加顺序返回所有 transaction.
 
 ### Confirmation Score
 
