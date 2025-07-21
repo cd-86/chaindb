@@ -9,11 +9,10 @@ type Chain struct {
 	lock   sync.RWMutex
 }
 
-func New() *Chain {
-	var the_genesis_block Block
-	return &Chain{
-		blocks: []Block{the_genesis_block},
-	}
+var TheChain = Chain{
+	blocks: []Block{
+		{ /* the Genesis Block */ },
+	},
 }
 
 func (chain *Chain) GetOwners() (
