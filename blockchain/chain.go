@@ -30,6 +30,7 @@ func (chain *Chain) avgBlkTime() time.Duration {
 
 	if num_blocks := len(chain.blocks); num_blocks == 0 {
 		log.Fatalln("区块链的长度应当永远是正数才对, 默认有创世区块")
+		return 0 // stupid gc
 	} else if num_blocks == 1 {
 		return chaindb_config.BlockTime
 	} else if num_blocks <= 6 {
