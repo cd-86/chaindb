@@ -9,10 +9,11 @@ type Chain struct {
 	lock   sync.RWMutex
 }
 
-var LocalChain = Chain{
-	blocks: []Block{
-		{ /* 创世区块 */ },
-	},
+func New() *Chain {
+	var the_genesis_block Block
+	return &Chain{
+		blocks: []Block{the_genesis_block},
+	}
 }
 
 func (chain *Chain) GetOwners() []struct {
@@ -43,4 +44,15 @@ func (chain *Chain) GetOwners() []struct {
 	}
 
 	return owners
+}
+
+func (chain *Chain) GetTxOwnedBy(owner_id uint32) {
+	type tx_t = struct {
+		ConfirmationScore uint32 `json:"ConfirmationScore"`
+		Data              string `json:"Data"`
+	}
+	transactions := []tx_t{}
+
+	chain.lock.RLock()
+	defer chain.lock.RUnlock()
 }

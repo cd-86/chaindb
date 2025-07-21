@@ -88,7 +88,7 @@ return std::vector</* Owner (匿名类) */>{
 #### 查询具体数据
 
 ```
-GetLocalTxOwnedBy <owner_uuid>
+GetLocalTxOwnedBy <OwnerID>
 ```
 
 返回 `Transactions[{ConfirmationScore: <uint>, Data: "..."}, ...]`:
