@@ -14,12 +14,7 @@ func StartMining(chain *Chain, tx_pool *TxPool) {
 
 func BuildBlockThenAppend_sync(chain *Chain, tx_pool *TxPool) {
 	candidates := func() map[uint32][]Transaction {
-		tx_bat := func() (tx_bat []Transaction) {
-			tx_pool.lock.Lock()
-			defer tx_pool.lock.Unlock()
-			tx_bat, tx_pool.transactions = tx_pool.transactions, nil
-			return
-		}()
+		tx_bat := tx_pool.ExchangeNil_sync()
 
 		candidates := make(map[uint32][]Transaction)
 		chain.lock.RLock()
@@ -29,6 +24,7 @@ func BuildBlockThenAppend_sync(chain *Chain, tx_pool *TxPool) {
 				candidates[tx.OwnerID] = append(candidates[tx.OwnerID], tx)
 			}
 		}
+
 		return candidates
 	}()
 

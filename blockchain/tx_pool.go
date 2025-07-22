@@ -1,7 +1,6 @@
 package blockchain
 
 import (
-	"container/list"
 	"sync"
 )
 
@@ -16,8 +15,9 @@ func (q *TxPool) Add_sync(tx Transaction) {
 	q.transactions = append(q.transactions, tx)
 }
 
-func (q *TxPool) Clear_sync(tx *list.Element) {
+func (q *TxPool) ExchangeNil_sync() (take []Transaction) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
-	q.transactions = nil
+	take, q.transactions = q.transactions, nil
+	return
 }
