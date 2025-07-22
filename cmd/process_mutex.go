@@ -14,6 +14,11 @@ import (
 	psutil_proc "github.com/shirou/gopsutil/v4/process"
 )
 
+var _ = func() any {
+	assertNoOtherChainDBInstance()
+	return nil
+}()
+
 func assertNoOtherChainDBInstance() {
 	pid_file_path := filepath.Join(
 		func() string {

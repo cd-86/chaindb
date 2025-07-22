@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-	prelude()
 	discovery.Start(1 * time.Second)
 	for ; ; time.Sleep(1 * time.Second) {
 		fmt.Println()

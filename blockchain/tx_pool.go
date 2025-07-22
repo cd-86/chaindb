@@ -35,7 +35,7 @@ func (pool *TxPool) Add(txs ...Transaction) {
 	}
 }
 
-func (pool *TxPool) PopFunc(txout chan<- Transaction, yes func(tx Transaction) bool) {
+func (pool *TxPool) PopFunc(txout chan<- Transaction, do_what func(tx Transaction) string) {
 	txs := func() (txs []Transaction) {
 		pool.lock.Lock()
 		defer pool.lock.Unlock()
@@ -46,10 +46,13 @@ func (pool *TxPool) PopFunc(txout chan<- Transaction, yes func(tx Transaction) b
 	}() // exchange
 
 	for _, tx := range txs {
-		if yes(tx) {
-			txout <- tx
-		} else {
+		switch do_what(tx) {
+		case "skip":
 			pool.Add(tx)
+		case "pop":
+			txout <- tx
+		case "discard":
+			continue
 		}
 	}
 	close(txout)
