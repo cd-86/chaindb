@@ -11,11 +11,12 @@ import (
 
 func StartMining(chain *Chain, tx_pool *TxPool) {
 	go func() {
-		for {
-			// 整个网络下一秒生成新区块的概率:
-			p := float64(
-				chain.AvgBlockTime(chaindb_config.DifficultyAdjustmentWindow),
-			) / float64(chaindb_config.BlockTime)
+		for ; ; time.Sleep(chaindb_config.BlockTime / 2.0) {
+			// 整个网络在当前半个 BlockTime 内生成新区块的概率:
+			p := 1 - 1/
+				(1+
+					(float64(chain.AvgBlockTime(chaindb_config.DifficultyAdjustmentWindow))/
+						float64(chaindb_config.BlockTime)))
 
 			// 当前节点生成新区块的概率:
 			p /= float64(len(*discovery.ActiveNodes.Load())) + 1
@@ -23,8 +24,6 @@ func StartMining(chain *Chain, tx_pool *TxPool) {
 			if rand.Float64() < p {
 				BuildBlockTryAppend(chain, tx_pool)
 			}
-
-			time.Sleep(chaindb_config.BlockTime)
 		}
 	}()
 }
