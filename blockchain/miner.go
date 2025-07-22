@@ -14,22 +14,22 @@ func StartMining(chain *Chain, tx_pool *TxPool) {
 
 func BuildBlockThenAppend_sync(chain *Chain, tx_pool *TxPool) {
 	candidates := func() map[uint32][]Transaction {
-		chain.lock.Lock()
-		defer chain.lock.Unlock()
-		return func() (candidates map[uint32][]Transaction) {
+		tx_bat := func() (tx_bat []Transaction) {
 			tx_pool.lock.Lock()
 			defer tx_pool.lock.Unlock()
-			for tx := tx_pool.transactions.Front(); tx != nil; tx = tx.Next() {
-				if chain.maybeValidNewTx(tx.Value.(Transaction)) {
-					candidates[tx.Value.(Transaction).OwnerID] = append(
-						candidates[tx.Value.(Transaction).OwnerID],
-						tx.Value.(Transaction),
-					)
-					tx_pool.transactions.Remove(tx)
-				}
-			}
+			tx_bat, tx_pool.transactions = tx_pool.transactions, nil
 			return
 		}()
+
+		candidates := make(map[uint32][]Transaction)
+		chain.lock.RLock()
+		defer chain.lock.RUnlock()
+		for _, tx := range tx_bat {
+			if chain.maybeValidNewTx(tx) {
+				candidates[tx.OwnerID] = append(candidates[tx.OwnerID], tx)
+			}
+		}
+		return candidates
 	}()
 
 	for _, txs := range candidates {

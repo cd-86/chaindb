@@ -6,24 +6,18 @@ import (
 )
 
 type TxPool struct {
-	transactions *list.List
+	transactions []Transaction
 	lock         sync.RWMutex
 }
 
-func NewTxPool() *TxPool {
-	return &TxPool{
-		transactions: list.New(),
-	}
-}
-
-func (q *TxPool) Enqueue_sync(tx Transaction) {
+func (q *TxPool) Add_sync(tx Transaction) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
-	q.transactions.PushBack(tx)
+	q.transactions = append(q.transactions, tx)
 }
 
-func (q *TxPool) Remove_sync(tx *list.Element) {
+func (q *TxPool) Clear_sync(tx *list.Element) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
-	q.transactions.Remove(tx)
+	q.transactions = nil
 }
