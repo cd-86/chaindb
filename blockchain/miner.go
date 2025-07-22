@@ -38,12 +38,19 @@ func BuildBlockThenAppend_sync(chain *Chain, tx_pool *TxPool) {
 	}
 
 	blk := Block{
-		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
-		UUID:      rand.Uint32(),
+		UUID: rand.Uint32(),
 		ParentUUID: func() Block {
 			chain.lock.RLock()
 			defer chain.lock.RUnlock()
 			return chain.blocks[len(chain.blocks)-1]
 		}().UUID,
+	}
+	defer func() {
+		blk.Timestamp = time.Duration(time.Now().UnixNano()).Seconds()
+	}()
+
+	tx_recycle := []Transaction{}
+	for owner, txs := range candidates {
+
 	}
 }

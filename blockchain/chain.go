@@ -24,6 +24,12 @@ func New() *Chain {
 	}
 }
 
+func (chain *Chain) Len_sync() int {
+	chain.lock.RLock()
+	defer chain.lock.RUnlock()
+	return len(chain.blocks)
+}
+
 // 有可能被加入到新区块所记录的交易列表中.
 func (chain *Chain) maybeValidNewTx(tx Transaction) bool {
 	return tx.Nonce >= uint32(len(chain.getTxOwnedBy(tx.OwnerID)))
