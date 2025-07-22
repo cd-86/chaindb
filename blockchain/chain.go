@@ -1,7 +1,6 @@
 package blockchain
 
 import (
-	"log"
 	"math/rand/v2"
 	"sync/atomic"
 	"time"
@@ -9,33 +8,24 @@ import (
 	chaindb_config "github.com/shynur/chaindb/config"
 )
 
-type Chain atomic.Pointer[Block]
+// 区块链最后一个区块的 UUID.
+type Chain atomic.Uint32
 
 func New() *Chain {
-	the_genesis_block := Block{
-		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
-	}
-	var chain atomic.Pointer[Block]
-	chain.Store(&the_genesis_block)
-	return (*Chain)(&chain)
+	var blk_uuid atomic.Uint32
+	return (*Chain)(&blk_uuid)
 }
 
-func ForkFrom(parent *Block) Block {
-	if parent == nil {
-		log.Fatalln("不允许从不存在的区块分叉")
-	}
+func ForkFrom(parent_uuid uint32) Block {
+	parent, _ := BlockCache.Load(parent_uuid)
+
 	return Block{
 		UUID:       rand.Uint32(),
-		Height:     parent.Height + 1,
-		ParentUUID: parent.ParentUUID,
-		parent:     parent,
+		Height:     parent.(Block).Height + 1,
+		ParentUUID: parent_uuid,
 
 		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
 	}
-}
-
-func (chain *Chain) Fork() Block {
-	return ForkFrom((*atomic.Pointer[Block])(chain).Load())
 }
 
 func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
@@ -43,7 +33,8 @@ func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
 		return chaindb_config.BlockTime
 	}
 
-	tail := (*atomic.Pointer[Block])(chain).Load()
+	tail_, _ := BlockCache.Load((*atomic.Uint32)(chain).Load())
+	tail := tail_.(Block)
 	num_blocks := tail.Height + 1
 
 	if num_blocks == 1 {
@@ -53,7 +44,7 @@ func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
 	if num_blocks <= uint32(samples) {
 		the_genesis_block := tail
 		for the_genesis_block.UUID != 0 {
-			the_genesis_block = the_genesis_block.parent
+			the_genesis_block, _ = the_genesis_block.Previous()
 		}
 		return time.Duration(
 			(tail.getSeenTimestamp() - the_genesis_block.getSeenTimestamp()) /
@@ -63,10 +54,25 @@ func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
 
 	begin := tail
 	for range samples - 1 {
-		begin = begin.parent
+		begin, _ = begin.Previous()
 	}
 	return time.Duration(
 		(tail.getSeenTimestamp() - begin.getSeenTimestamp()) /
 			(float64(samples - 1)),
 	)
+}
+
+func (chain *Chain) TrySwitchHead(new_tail_uuid uint32) (switched bool) {
+	new_tail, _ := BlockCache.Load(new_tail_uuid)
+
+	if new_tail.(Block).Height >= chain.Length() {
+		(*atomic.Uint32)(chain).Store(new_tail_uuid)
+		return true
+	}
+	return false
+}
+
+func (chain *Chain) Length() uint32 {
+	tail, _ := BlockCache.Load((*atomic.Uint32)(chain).Load())
+	return tail.(Block).Height + 1
 }
