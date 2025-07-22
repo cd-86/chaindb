@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -88,7 +89,6 @@ func assertNoOtherChainDBInstance() {
 			continue
 		}
 
-		fmt.Fprintf(os.Stderr, "本机上有其它 ChainDB 进行在运行\n")
-		os.Exit(1)
+		log.Fatalln("本机上有其它 ChainDB 进行在运行")
 	}
 }

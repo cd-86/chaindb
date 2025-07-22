@@ -2,122 +2,71 @@ package blockchain
 
 import (
 	"log"
-	"sync"
+	"math/rand/v2"
+	"sync/atomic"
 	"time"
 
 	chaindb_config "github.com/shynur/chaindb/config"
 )
 
-type Chain struct {
-	blocks []Block
-	lock   sync.RWMutex
-}
+type Chain atomic.Pointer[Block]
 
 func New() *Chain {
 	the_genesis_block := Block{
 		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
 	}
-	return &Chain{
-		blocks: []Block{
-			the_genesis_block,
-		},
+	var chain atomic.Pointer[Block]
+	chain.Store(&the_genesis_block)
+	return (*Chain)(&chain)
+}
+
+func ForkFrom(parent *Block) Block {
+	if parent == nil {
+		log.Fatalln("不允许从不存在的区块分叉")
+	}
+	return Block{
+		UUID:       rand.Uint32(),
+		Height:     parent.Height + 1,
+		ParentUUID: parent.ParentUUID,
+		parent:     parent,
+
+		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
 	}
 }
 
-func (chain *Chain) Len_sync() int {
-	chain.lock.RLock()
-	defer chain.lock.RUnlock()
-	return len(chain.blocks)
+func (chain *Chain) Fork() Block {
+	return ForkFrom((*atomic.Pointer[Block])(chain).Load())
 }
 
-// 有可能被加入到新区块所记录的交易列表中.
-func (chain *Chain) maybeValidNewTx(tx Transaction) bool {
-	return tx.Nonce >= uint32(len(chain.getTxOwnedBy(tx.OwnerID)))
-}
-
-func (chain *Chain) avgBlkTime() time.Duration {
-	if num_blocks := len(chain.blocks); num_blocks == 0 {
-		log.Fatalln("区块链的长度应当永远是正数才对, 默认有创世区块")
-		return 0 // stupid gc
-	} else if num_blocks == 1 {
+func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
+	if samples <= 1 {
 		return chaindb_config.BlockTime
-	} else if num_blocks <= 6 {
-		return time.Duration(
-			(chain.blocks[num_blocks-1].getSeenTimestamp() -
-				chain.blocks[0].getSeenTimestamp()) /
-				float64(num_blocks-1),
-		)
-	} else {
-		return time.Duration(
-			(chain.blocks[num_blocks-1].getSeenTimestamp() -
-				chain.blocks[num_blocks-6].getSeenTimestamp()) /
-				5.0,
-		)
 	}
-}
 
-func (chain *Chain) GetOwners_sync() (
-	owners []struct {
-		OwnerID           uint32 `json:"OwnerID"`
-		ConfirmationScore uint32 `json:"ConfirmationScore"`
-	},
-) {
-	chain.lock.RLock()
-	defer chain.lock.RUnlock()
+	tail := (*atomic.Pointer[Block])(chain).Load()
+	num_blocks := tail.Height + 1
 
-	for i, block := range chain.blocks {
-		for _, tx := range block.Transactions {
-			if tx.Nonce == 0 {
-				owners = append(
-					owners,
-					struct {
-						OwnerID           uint32 `json:"OwnerID"`
-						ConfirmationScore uint32 `json:"ConfirmationScore"`
-					}{
-						OwnerID:           tx.OwnerID,
-						ConfirmationScore: uint32(len(chain.blocks) - i - 1),
-					},
-				)
-			}
+	if num_blocks == 1 {
+		return chaindb_config.BlockTime
+	}
+
+	if num_blocks <= uint32(samples) {
+		the_genesis_block := tail
+		for the_genesis_block.UUID != 0 {
+			the_genesis_block = the_genesis_block.parent
 		}
+		return time.Duration(
+			(tail.getSeenTimestamp() - the_genesis_block.getSeenTimestamp()) /
+				(float64(samples - 1)),
+		)
 	}
 
-	return owners
-}
-
-func (chain *Chain) GetTxOwnedBy_sync(owner_id uint32) (
-	transactions []struct {
-		ConfirmationScore uint32 `json:"ConfirmationScore"`
-		Data              string `json:"Data"`
-	},
-) {
-	chain.lock.RLock()
-	defer chain.lock.RUnlock()
-	return chain.getTxOwnedBy(owner_id)
-}
-
-func (chain *Chain) getTxOwnedBy(owner_id uint32) (
-	transactions []struct {
-		ConfirmationScore uint32 `json:"ConfirmationScore"`
-		Data              string `json:"Data"`
-	},
-) {
-	for i, block := range chain.blocks {
-		for _, tx := range block.Transactions {
-			if tx.OwnerID == owner_id {
-				transactions = append(
-					transactions,
-					struct {
-						ConfirmationScore uint32 `json:"ConfirmationScore"`
-						Data              string `json:"Data"`
-					}{
-						ConfirmationScore: uint32(len(chain.blocks) - i - 1),
-						Data:              tx.Data,
-					},
-				)
-			}
-		}
+	begin := tail
+	for range samples - 1 {
+		begin = begin.parent
 	}
-
-	return transactions
+	return time.Duration(
+		(tail.getSeenTimestamp() - begin.getSeenTimestamp()) /
+			(float64(samples - 1)),
+	)
 }
