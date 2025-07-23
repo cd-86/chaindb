@@ -25,10 +25,24 @@ func StartMining(chain *Chain, tx_pool *TxPool) {
 					(float64(chain.AvgBlockTime())/
 						float64(chaindb_config.BlockTime)))
 
+			// p 的预期值是 50%.
+			switch lower_threshold_percent := 10; {
+			case p < float64(lower_threshold_percent)/100.0:
+				log.Printf(
+					"网络中下一个区块生成的概率预估为 p=%.2f%% < %d%%!\n",
+					p*100, lower_threshold_percent,
+				)
+			case p > float64(100-lower_threshold_percent)/100.0:
+				log.Printf(
+					"网络中下一个区块生成的概率预估为 p=%.2f%% > %d%%!\n",
+					p*100, 100-lower_threshold_percent,
+				)
+			}
+
 			// 当前节点生成新区块的概率:
 			p /= float64(len(*discovery.ActiveNodes.Load())) + 1
 
-			log.Printf("本机在当前检查点产生区块的概率为: %.2f%%\n", p*100)
+			log.Printf("本机在当前检查点 (间隔期望 BlockTime 的一半) 产生区块的概率为: %.2f%%\n", p*100)
 			if rand.Float64() < p {
 				log.Println("开采新区块...")
 				BuildBlockTryAppend(chain, tx_pool)
