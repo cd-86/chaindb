@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"log"
 	"math/rand/v2"
 	"sync/atomic"
 	"time"
@@ -26,7 +27,9 @@ func StartMining(chain *Chain, tx_pool *TxPool) {
 			// 当前节点生成新区块的概率:
 			p /= float64(len(*discovery.ActiveNodes.Load())) + 1
 
+			log.Printf("本机在当前检查点产生区块的概率为: %.2f%%\n", p*100)
 			if rand.Float64() < p {
+				log.Println("开采新区块...")
 				BuildBlockTryAppend(chain, tx_pool)
 			}
 		}
@@ -59,5 +62,7 @@ func BuildBlockTryAppend(chain *Chain, tx_pool *TxPool) {
 	}
 
 	BlockCache.Store(blk.UUID, blk)
+	log.Printf("以开采新区块, UUID=%d, Height=%d\n", blk.UUID, blk.Height)
+
 	chain.TrySwitchHead(blk.UUID)
 }

@@ -1,7 +1,9 @@
 package blockchain
 
 import (
+	"fmt"
 	"math/rand/v2"
+	"slices"
 	"sync/atomic"
 	"time"
 
@@ -10,6 +12,23 @@ import (
 
 // 区块链最后一个区块的 UUID.
 type Chain atomic.Uint32
+
+func (chain *Chain) String() string {
+	tail_uuid := (*atomic.Uint32)(chain).Load()
+	tail, _ := BlockCache.Load(tail_uuid)
+
+	reversed_chain := []Block{tail.(Block)}
+	for reversed_chain[len(reversed_chain)-1].UUID != 0 {
+		previous, _ := reversed_chain[len(reversed_chain)-1].Previous()
+		reversed_chain = append(
+			reversed_chain,
+			previous,
+		)
+	}
+	slices.Reverse(reversed_chain)
+
+	return fmt.Sprintf("%+v", reversed_chain)
+}
 
 func New() *Chain {
 	var blk_uuid atomic.Uint32
@@ -42,12 +61,9 @@ func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
 	}
 
 	if num_blocks <= uint32(samples) {
-		the_genesis_block := tail
-		for the_genesis_block.UUID != 0 {
-			the_genesis_block, _ = the_genesis_block.Previous()
-		}
+		the_genesis_block, _ := BlockCache.Load(uint32(0))
 		return time.Duration(
-			(tail.getSeenTimestamp() - the_genesis_block.getSeenTimestamp()) /
+			(tail.getSeenTimestamp() - the_genesis_block.(Block).getSeenTimestamp()) /
 				(float64(samples - 1)),
 		)
 	}

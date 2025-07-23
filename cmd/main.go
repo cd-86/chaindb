@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand/v2"
 	"time"
 
@@ -11,13 +12,18 @@ import (
 
 func main() {
 	discovery.Start(chaindb_config.DiscoveryInterval)
+
 	blockchain.StartMining(LocalChain, &LocalTxPool)
 
-	for ; ; time.Sleep(100 * time.Millisecond) {
+	for i := 0; i != 10_0000; i++ {
 		tx := blockchain.Transaction{
 			OwnerID: rand.Uint32N(5),
-			Nonce:   rand.Uint32N(10),
+			Nonce:   rand.Uint32N(5),
 		}
 		LocalTxPool.Add(tx)
+
+		time.Sleep(100 * time.Microsecond) // 0.0001s
 	}
+
+	fmt.Printf("%+v", LocalChain)
 }

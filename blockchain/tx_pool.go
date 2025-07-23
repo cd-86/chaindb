@@ -52,7 +52,6 @@ func (pool *TxPool) PopFunc(txout chan<- Transaction, do_what func(tx Transactio
 		case "pop":
 			txout <- tx
 		case "discard":
-			continue
 		}
 	}
 	close(txout)

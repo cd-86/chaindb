@@ -24,12 +24,13 @@ var BlockCache = func() *sync.Map {
 	the_genesis_block := Block{
 		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
 		UUID:      0,
+		Height:    0,
 	}
 
 	cache.Store(the_genesis_block.UUID, the_genesis_block)
 
 	return &cache
-}() // UUID -> Block
+}() // UUID:uint32 -> Block
 
 func (blk Block) getSeenTimestamp() float64 {
 	if blk.receivedTimestamp != 0 {
@@ -40,10 +41,7 @@ func (blk Block) getSeenTimestamp() float64 {
 }
 
 func (tail Block) nextNonceOf(owner uint32) uint32 {
-	for blk := tail; blk.Height != 0; func() Block {
-		blk, _ := BlockCache.Load(blk.ParentUUID)
-		return blk.(Block)
-	}() {
+	for blk := tail; blk.Height != 0; blk, _ = blk.Previous() {
 		for _, tx_in_fork := range slices.Backward(blk.Transactions) {
 			if tx_in_fork.OwnerID == owner {
 				return tx_in_fork.Nonce + 1
