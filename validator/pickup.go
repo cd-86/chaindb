@@ -11,7 +11,7 @@ import (
 	"github.com/shynur/chaindb/chaindb_config"
 )
 
-func StartTryPickBlocks() {
+func StartTryPickBlocks(chain *blockchain.Chain) {
 	conn, err := net.ListenPacket(
 		"udp",
 		net.JoinHostPort(
@@ -39,6 +39,11 @@ func StartTryPickBlocks() {
 
 			var blk blockchain.Block
 			gob.NewDecoder(bytes.NewBuffer(blk_obj)).Decode(&blk)
+			blockchain.BlockCache.Store(blk.UUID, blk)
+
+			if blk.Height > chain.Head().Height {
+				go pull(chain, blk.UUID)
+			}
 		}
 	}()
 }
