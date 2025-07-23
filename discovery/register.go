@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/grandcat/zeroconf"
-	chaindb_config "github.com/shynur/chaindb/config"
+	"github.com/shynur/chaindb/chaindb_config"
 )
 
 func Register(interval_checking_network time.Duration) {
