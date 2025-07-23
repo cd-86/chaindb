@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	chaindb_config "github.com/shynur/chaindb/config"
+	"github.com/shynur/chaindb/chaindb_config"
 	"github.com/shynur/chaindb/discovery"
 )
 

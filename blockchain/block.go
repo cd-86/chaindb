@@ -8,8 +8,8 @@ import (
 )
 
 type Block struct {
-	Timestamp         float64 `json:"Timestamp"`
-	receivedTimestamp float64 // 为 0 表示是本机自己挖出来的区块.
+	Timestamp    float64 `json:"Timestamp"`
+	MinerAddress string  `json:"MinerAddress"`
 
 	UUID       uint32 `json:"UUID"`
 	Height     uint32 `json:"Height"`
@@ -31,14 +31,6 @@ var BlockCache = func() *sync.Map {
 
 	return &cache
 }() // UUID:uint32 -> Block
-
-func (blk Block) getSeenTimestamp() float64 {
-	if blk.receivedTimestamp != 0 {
-		return blk.receivedTimestamp
-	} else {
-		return blk.Timestamp
-	}
-}
 
 func (tail Block) nextNonceOf(owner uint32) uint32 {
 	for blk := tail; blk.Height != 0; blk, _ = blk.Previous() {

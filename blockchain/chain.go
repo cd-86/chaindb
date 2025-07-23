@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	chaindb_config "github.com/shynur/chaindb/config"
+	"github.com/shynur/chaindb/chaindb_config"
 )
 
 // 区块链最后一个区块的 UUID.
@@ -43,6 +43,8 @@ func ForkFrom(parent_uuid uint32) Block {
 		Height:     parent.(Block).Height + 1,
 		ParentUUID: parent_uuid,
 
+		MinerAddress: chaindb_config.MinerAddress,
+
 		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
 	}
 }
@@ -63,7 +65,7 @@ func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
 	if num_blocks <= uint32(samples) {
 		the_genesis_block, _ := BlockCache.Load(uint32(0))
 		return time.Duration(
-			(tail.getSeenTimestamp() - the_genesis_block.(Block).getSeenTimestamp()) /
+			(tail.Timestamp - the_genesis_block.(Block).Timestamp) /
 				(float64(samples - 1)) *
 				1e9,
 		)
@@ -74,7 +76,7 @@ func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
 		begin, _ = begin.Previous()
 	}
 	return time.Duration(
-		(tail.getSeenTimestamp() - begin.getSeenTimestamp()) /
+		(tail.Timestamp - begin.Timestamp) /
 			(float64(samples - 1)) *
 			1e9,
 	)
