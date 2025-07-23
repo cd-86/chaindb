@@ -64,7 +64,8 @@ func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
 		the_genesis_block, _ := BlockCache.Load(uint32(0))
 		return time.Duration(
 			(tail.getSeenTimestamp() - the_genesis_block.(Block).getSeenTimestamp()) /
-				(float64(samples - 1)),
+				(float64(samples - 1)) *
+				1e9,
 		)
 	}
 
@@ -74,7 +75,8 @@ func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
 	}
 	return time.Duration(
 		(tail.getSeenTimestamp() - begin.getSeenTimestamp()) /
-			(float64(samples - 1)),
+			(float64(samples - 1)) *
+			1e9,
 	)
 }
 
