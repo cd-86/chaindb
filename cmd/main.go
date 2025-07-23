@@ -1,11 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"math/rand/v2"
-	"time"
-
-	"github.com/shynur/chaindb/blockchain"
 	"github.com/shynur/chaindb/chaindb_config"
 	"github.com/shynur/chaindb/discovery"
 )
@@ -13,7 +8,7 @@ import (
 func main() {
 	discovery.Start(chaindb_config.DiscoveryInterval)
 
-	blockchain.StartMining(LocalChain, &LocalTxPool)
+	/* blockchain.StartMining(LocalChain, &LocalTxPool)
 
 	for i := 0; i != 10_0000; i++ {
 		tx := blockchain.Transaction{
@@ -25,5 +20,6 @@ func main() {
 		time.Sleep(time.Millisecond)
 	}
 
-	fmt.Println(LocalChain)
+	fmt.Println(LocalChain) */
+	select {}
 }

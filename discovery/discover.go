@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/grandcat/zeroconf"
+	"github.com/shynur/chaindb/chaindb_config"
 )
 
 func FindAll(timeout time.Duration) []net.IP {
@@ -20,7 +21,7 @@ func FindAll(timeout time.Duration) []net.IP {
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(results <-chan *zeroconf.ServiceEntry) {
 		for entry := range results {
-			if entry.Instance == UniqueNodeName {
+			if entry.Instance == chaindb_config.MinerAddress {
 				continue
 			}
 
