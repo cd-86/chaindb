@@ -11,6 +11,9 @@
         "editor.tabSize": 8,
         "editor.insertSpaces": false
     },
+    "go.testFlags": [
+        "-test.v"
+    ],
     "[yaml]": {
         "editor.insertSpaces": true,
         "editor.tabSize": 2
