@@ -29,7 +29,7 @@ func StartTryPickBlocks() {
 			n, _, _ := conn.ReadFrom(blk_obj)
 
 			if n >= len(blk_obj) {
-				log.Printf("接收到的区块数据过大, 被丢弃\n")
+				log.Printf("接收到的区块数据过大, 被丢弃!\n")
 				continue
 			} else {
 				log.Printf("接收到其它矿工开采的区块: size=%dB\n", n)
