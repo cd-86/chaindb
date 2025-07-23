@@ -21,4 +21,4 @@ jobs:
           go-version: 'stable'
 
       - name: Run Tests
-        run: go test ./discovery
+        run: go test ./...
