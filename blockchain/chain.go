@@ -13,11 +13,14 @@ import (
 // 区块链最后一个区块的 UUID.
 type Chain atomic.Uint32
 
-func (chain *Chain) String() string {
-	tail_uuid := (*atomic.Uint32)(chain).Load()
-	tail, _ := BlockCache.Load(tail_uuid)
+func (chain *Chain) Head() Block {
+	head_uuid := (*atomic.Uint32)(chain).Load()
+	head, _ := BlockCache.Load(head_uuid)
+	return head.(Block)
+}
 
-	reversed_chain := []Block{tail.(Block)}
+func (chain *Chain) String() string {
+	reversed_chain := []Block{chain.Head()}
 	for reversed_chain[len(reversed_chain)-1].UUID != 0 {
 		previous, _ := reversed_chain[len(reversed_chain)-1].Previous()
 		reversed_chain = append(
@@ -53,8 +56,7 @@ func ForkFrom(parent_uuid uint32) Block {
 // 只对 locally mined block 进行采样,
 // 因为其它 block 的 Timestamp 并不是相对于本机的时间线.
 func (chain *Chain) AvgBlockTime() time.Duration {
-	tail, _ := BlockCache.Load((*atomic.Uint32)(chain).Load())
-	right := tail.(Block)
+	right := chain.Head()
 
 	for right.MinerAddress != chaindb_config.MinerAddress {
 		right, _ = right.Previous()
@@ -79,14 +81,9 @@ func (chain *Chain) AvgBlockTime() time.Duration {
 func (chain *Chain) TrySwitchHead(new_tail_uuid uint32) (switched bool) {
 	new_tail, _ := BlockCache.Load(new_tail_uuid)
 
-	if new_tail.(Block).Height >= chain.Length() {
+	if new_tail.(Block).Height > chain.Head().Height {
 		(*atomic.Uint32)(chain).Store(new_tail_uuid)
 		return true
 	}
 	return false
-}
-
-func (chain *Chain) Length() uint32 {
-	tail, _ := BlockCache.Load((*atomic.Uint32)(chain).Load())
-	return tail.(Block).Height + 1
 }
