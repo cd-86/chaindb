@@ -7,4 +7,4 @@ import "time"
 const DiscoveryInterval = 10 * time.Second
 
 // 使用 mDNS DNS-SD 进行服务发现的端口.
-const DNSSDPort = 56780
+const DNSSDPort = 56781
