@@ -63,7 +63,7 @@ func BuildBlockTryAppend(chain *Chain, tx_pool *TxPool) {
 	}
 
 	BlockCache.Store(blk.UUID, blk)
-	log.Printf("以开采新区块, UUID=%d, Height=%d\n", blk.UUID, blk.Height)
+	log.Printf("已开采新区块, UUID=%d, Height=%d\n", blk.UUID, blk.Height)
 
 	chain.TrySwitchHead(blk.UUID)
 }
