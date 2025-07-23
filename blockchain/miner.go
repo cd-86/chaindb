@@ -22,7 +22,7 @@ func StartMining(chain *Chain, tx_pool *TxPool) {
 			// 这样两个 block 之间的时间间隔的数学期望就是一个 BlockTime.
 			p := 1 - 1/
 				(1+
-					(float64(chain.AvgBlockTime(chaindb_config.DifficultyAdjustmentWindow))/
+					(float64(chain.AvgBlockTime())/
 						float64(chaindb_config.BlockTime)))
 
 			// 当前节点生成新区块的概率:

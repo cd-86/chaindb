@@ -15,14 +15,14 @@ func main() {
 
 	blockchain.StartMining(LocalChain, &LocalTxPool)
 
-	for i := 0; i != 1_000; i++ {
+	for i := 0; i != 10_0000; i++ {
 		tx := blockchain.Transaction{
-			OwnerID: rand.Uint32N(3),
-			Nonce:   rand.Uint32N(5),
+			OwnerID: rand.Uint32N(20),
+			Nonce:   rand.Uint32N(10),
 		}
 		LocalTxPool.Add(tx)
 
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(time.Millisecond)
 	}
 
 	fmt.Println(LocalChain)

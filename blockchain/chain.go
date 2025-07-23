@@ -49,35 +49,29 @@ func ForkFrom(parent_uuid uint32) Block {
 	}
 }
 
-func (chain *Chain) AvgBlockTime(samples uint) time.Duration {
-	if samples <= 1 {
+// 查看最近两个 locally mined block 区间的平均区块时间.
+// 只对 locally mined block 进行采样,
+// 因为其它 block 的 Timestamp 并不是相对于本机的时间线.
+func (chain *Chain) AvgBlockTime() time.Duration {
+	tail, _ := BlockCache.Load((*atomic.Uint32)(chain).Load())
+	right := tail.(Block)
+
+	for right.MinerAddress != chaindb_config.MinerAddress {
+		right, _ = right.Previous()
+	}
+
+	if right.Height == 0 {
 		return chaindb_config.BlockTime
 	}
 
-	tail_, _ := BlockCache.Load((*atomic.Uint32)(chain).Load())
-	tail := tail_.(Block)
-	num_blocks := tail.Height + 1
-
-	if num_blocks == 1 {
-		return chaindb_config.BlockTime
+	left, _ := right.Previous()
+	for left.MinerAddress != chaindb_config.MinerAddress {
+		left, _ = left.Previous()
 	}
 
-	if num_blocks <= uint32(samples) {
-		the_genesis_block, _ := BlockCache.Load(uint32(0))
-		return time.Duration(
-			(tail.Timestamp - the_genesis_block.(Block).Timestamp) /
-				(float64(samples - 1)) *
-				1e9,
-		)
-	}
-
-	begin := tail
-	for range samples - 1 {
-		begin, _ = begin.Previous()
-	}
 	return time.Duration(
-		(tail.Timestamp - begin.Timestamp) /
-			(float64(samples - 1)) *
+		(right.Timestamp - left.Timestamp) /
+			float64((right.Height - left.Height)) *
 			1e9,
 	)
 }

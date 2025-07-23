@@ -5,6 +5,8 @@ import (
 	"slices"
 	"sync"
 	"time"
+
+	"github.com/shynur/chaindb/chaindb_config"
 )
 
 type Block struct {
@@ -22,9 +24,10 @@ var BlockCache = func() *sync.Map {
 	var cache sync.Map
 
 	the_genesis_block := Block{
-		Timestamp: time.Duration(time.Now().UnixNano()).Seconds(),
-		UUID:      0,
-		Height:    0,
+		Timestamp:    time.Duration(time.Now().UnixNano()).Seconds(),
+		MinerAddress: chaindb_config.MinerAddress,
+		UUID:         0,
+		Height:       0,
 	}
 
 	cache.Store(the_genesis_block.UUID, the_genesis_block)
