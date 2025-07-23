@@ -12,7 +12,12 @@ import (
 func StartMining(chain *Chain, tx_pool *TxPool) {
 	go func() {
 		for ; ; time.Sleep(chaindb_config.BlockTime / 2.0) {
-			// 整个网络在当前半个 BlockTime 内生成新区块的概率:
+			// 整个区块链网络在某个时间节点生成新区块的概率:
+			// p = 1 - 1/(1 + 当前block_time/BlockTime), p∈[0, 1)
+			// 当前block_time 增加, p 增加, 使 当前block_time 减小.
+			// 当前block_time = 预期时, p = 50%.
+			// 因此每半个 BlockTime 检查一次,
+			// 这样两个 block 之间的时间间隔的数学期望就是一个 BlockTime.
 			p := 1 - 1/
 				(1+
 					(float64(chain.AvgBlockTime(chaindb_config.DifficultyAdjustmentWindow))/
