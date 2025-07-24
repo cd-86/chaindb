@@ -47,13 +47,15 @@ func (s blockPCDNServer) GetBlock(
 	ctx context.Context,
 	arg *block_cdn.BlockUUID,
 ) (*block_cdn.BlockGob, error) {
-	blk, ok := blockchain.BlockCache.Load(arg.GetUUID())
-
+	blk, ok := blockCacheDetached.Load(arg.GetUUID())
 	if !ok {
-		return nil, status.Errorf(
-			codes.NotFound,
-			"block not found: %d", arg.UUID,
-		)
+		blk, ok = blockchain.BlockCache.Load(arg.GetUUID())
+		if !ok {
+			return nil, status.Errorf(
+				codes.NotFound,
+				"block not found: %d", arg.UUID,
+			)
+		}
 	}
 
 	return &block_cdn.BlockGob{
