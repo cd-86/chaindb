@@ -18,9 +18,9 @@ func main() {
 	validator.StartTryPickBlocks(LocalChain)
 	blockchain.StartMining(LocalChain, &LocalTxPool, validator.Propose)
 
-	for i := 0; i != 10_000; i++ {
+	for i := 0; i != 20_000; i++ {
 		tx := blockchain.Transaction{
-			OwnerID: rand.Uint32N(10),
+			OwnerID: rand.Uint32N(20),
 			Nonce:   10,
 		}
 		LocalTxPool.Add(tx)
