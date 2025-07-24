@@ -65,7 +65,11 @@ func pullOneBlock(blk_uuid uint32) (blk blockchain.Block, err error) {
 
 	err = blk.FromGob(<-block_request)
 	if err == nil {
-		log.Printf("[  Pull ] 拉取到区块 BlockUUID=%d\n", blk_uuid)
+		log.Printf(
+			"[  Pull ] 拉取到区块 Block.UUID=%d, Block.Height=%d\n",
+			blk.UUID,
+			blk.Height,
+		)
 		blockCacheDetached.Store(blk_uuid, blk)
 	}
 	return
