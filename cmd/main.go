@@ -14,12 +14,8 @@ import (
 func main() {
 	discovery.Start(chaindb_config.DiscoveryInterval)
 
-	blockchain.StartMining(LocalChain, &LocalTxPool)
 	validator.StartTryPickBlocks(LocalChain)
-	validator.StartProposePeriodically(
-		LocalChain,
-		chaindb_config.BlockTime,
-	)
+	blockchain.StartMining(LocalChain, &LocalTxPool, validator.Propose)
 
 	for i := 0; i != 10_0000; i++ {
 		tx := blockchain.Transaction{

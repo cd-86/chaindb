@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/shynur/chaindb/validator/block_cdn";
+
+service BlockDelivery {
+  rpc GetBlock (BlockUUID) returns (BlockGob);
+}
+
+message BlockUUID {
+  uint32 UUID = 1;
+}
+
+message BlockGob {
+  bytes Buffer = 1;
+}

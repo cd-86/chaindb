@@ -10,7 +10,7 @@ import (
 	"github.com/shynur/chaindb/discovery"
 )
 
-func StartMining(chain *Chain, tx_pool *TxPool) {
+func StartMining(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
 	go func() {
 		const check_interval = chaindb_config.BlockTime / 2
 		for time.Sleep(check_interval); ; time.Sleep(check_interval) {
@@ -45,13 +45,13 @@ func StartMining(chain *Chain, tx_pool *TxPool) {
 			log.Printf("本机在当前检查点 (间隔期望 BlockTime 的一半) 产生区块的概率为: %.2f%%\n", p*100)
 			if rand.Float64() < p {
 				log.Println("开采新区块...")
-				BuildBlockTryAppend(chain, tx_pool)
+				BuildBlockTryAppend(chain, tx_pool, proposer)
 			}
 		}
 	}()
 }
 
-func BuildBlockTryAppend(chain *Chain, tx_pool *TxPool) {
+func BuildBlockTryAppend(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
 	blk := ForkFrom((*atomic.Uint32)(chain).Load())
 
 	txin := make(chan Transaction)
@@ -78,6 +78,6 @@ func BuildBlockTryAppend(chain *Chain, tx_pool *TxPool) {
 
 	BlockCache.Store(blk.UUID, blk)
 	log.Printf("已开采新区块, UUID=%d, Height=%d\n", blk.UUID, blk.Height)
-
+	go proposer(blk)
 	chain.TrySwitchHead(blk.UUID)
 }

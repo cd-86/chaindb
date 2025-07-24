@@ -10,3 +10,5 @@
 $RECYCLE.BIN/
 
 ?*.exe
+
+?*.pb.go
