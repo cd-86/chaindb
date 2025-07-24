@@ -21,7 +21,7 @@ var blockCacheDetached sync.Map
 func pullOneBlock(blk_uuid uint32) (blk blockchain.Block, err error) {
 	cached_detached_block, exist := blockCacheDetached.Load(blk_uuid)
 	if exist {
-		log.Printf("拉取区块时命中缓存: BlockUUID=%d\n", blk_uuid)
+		log.Printf("[  Pull ] 拉取区块时命中缓存: BlockUUID=%d\n", blk_uuid)
 		return cached_detached_block.(blockchain.Block), nil
 	}
 
