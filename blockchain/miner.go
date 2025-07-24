@@ -11,6 +11,8 @@ import (
 )
 
 func StartMining(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
+	log.Printf("启动矿工...\n")
+
 	go func() {
 		const check_interval = chaindb_config.BlockTime / 2
 		for time.Sleep(check_interval); ; time.Sleep(check_interval) {

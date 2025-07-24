@@ -2,6 +2,7 @@ package validator
 
 import (
 	"context"
+	"log"
 	"net"
 	"strconv"
 
@@ -14,7 +15,7 @@ import (
 )
 
 func StartBlockDeliveryServer() {
-	_ = blockchain.BlockCache
+	log.Printf("正在启动区块 PCDN 服务器...")
 
 	listener, err := net.Listen(
 		"tcp",
@@ -26,15 +27,16 @@ func StartBlockDeliveryServer() {
 	if err != nil {
 		panic(err)
 	}
+	log.Printf("区块 PCDN 服务器开始监听端口: %d", chaindb_config.TCPPortBlockPCDN)
 
 	server := grpc.NewServer()
 	block_cdn.RegisterBlockDeliveryServer(
 		server,
 		&blockPCDNServer{},
 	)
-	if err := server.Serve(listener); err != nil {
-		panic(err)
-	}
+	go server.Serve(listener)
+
+	log.Printf("区块 PCDN 服务器正常运行")
 }
 
 type blockPCDNServer struct {
