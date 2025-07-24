@@ -16,7 +16,7 @@ func StartMining(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
 	go func() {
 		const check_interval = chaindb_config.BlockTime / 2
 		for time.Sleep(check_interval); ; time.Sleep(check_interval) {
-			// 整个区块链网络在某个时间节点生成新区块的概率:
+			// 设定整个区块链网络在某个时间节点生成新区块的概率:
 			// p = 1 - 1/(1 + 当前block_time/BlockTime), p∈[0, 1)
 			// 当前block_time 增加, p 增加, 使 当前block_time 减小.
 			// 当前block_time = 预期时, p = 50%.
@@ -27,16 +27,15 @@ func StartMining(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
 					(float64(chain.AvgBlockTime())/
 						float64(chaindb_config.BlockTime)))
 
-			// 根据单一节点预估网络中下一个区块生成的概率.
 			switch lower_threshold_percent := 10; {
 			case p < float64(lower_threshold_percent)/100.0:
 				log.Printf(
-					"[  Flip ] 网络中下一个区块生成的概率 (理应是 50%%) 预估为 p=%.2f%% < %d%%!\n",
+					"[  Flip ] 网络中下一个区块生成的概率 (理应是 50%%) 调整为 p=%.2f%% < %d%%!\n",
 					p*100, lower_threshold_percent,
 				)
 			case p > float64(100-lower_threshold_percent)/100.0:
 				log.Printf(
-					"[  Flip ] 网络中下一个区块生成的概率 (理应是 50%%) 预估为 p=%.2f%% > %d%%!\n",
+					"[  Flip ] 网络中下一个区块生成的概率 (理应是 50%%) 调整为 p=%.2f%% > %d%%!\n",
 					p*100, 100-lower_threshold_percent,
 				)
 			}

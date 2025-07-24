@@ -52,30 +52,22 @@ func ForkFrom(parent_uuid uint32) Block {
 	}
 }
 
-// 查看最近两个 locally mined block 区间的平均区块时间.
-// 只对 locally mined block 进行采样,
-// 因为其它 block 的 Timestamp 并不是相对于本机的时间线.
+// 对最近两个 由同一个矿工挖出的 block 进行采样, 算出平均区块时间.
 func (chain *Chain) AvgBlockTime() time.Duration {
-	right := chain.Head()
+	recently_mined := map[string]Block{}
 
-	for right.MinerAddress != chaindb_config.MinerAddress {
-		right, _ = right.Previous()
+	for blk := chain.Head(); blk.UUID != 0; blk, _ = blk.Previous() {
+		if descendant_blk, exists := recently_mined[blk.MinerAddress]; exists {
+			return time.Duration(
+				(descendant_blk.Timestamp - blk.Timestamp) /
+					float64((descendant_blk.Height - blk.Height)) *
+					1e9,
+			)
+		}
+		recently_mined[blk.MinerAddress] = blk
 	}
 
-	if right.Height == 0 {
-		return chaindb_config.BlockTime
-	}
-
-	left, _ := right.Previous()
-	for left.MinerAddress != chaindb_config.MinerAddress {
-		left, _ = left.Previous()
-	}
-
-	return time.Duration(
-		(right.Timestamp - left.Timestamp) /
-			float64((right.Height - left.Height)) *
-			1e9,
-	)
+	return chaindb_config.BlockTime
 }
 
 func (chain *Chain) TrySwitchHead(new_tail_uuid uint32) (switched bool) {
