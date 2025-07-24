@@ -11,16 +11,22 @@ cd shynur/Downloads
 
 # 安装 Go 工具链.
 sudo rm -rf /usr/local/go
-wget https://go.dev/dl/go1.24.5.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.24.5.linux-amd64.tar.gz
+precompiled_go=go1.24.5.linux-amd64.tar.gz
+if ! [ -f $precompiled_go ]; then
+    wget https://go.dev/dl/$precompiled_go
+fi
+sudo tar -C /usr/local -xzf $precompiled_go
 export PATH+=:/usr/local/go/bin
 go version
 
 # 安装 protoc.
-curl -LO  \
-    https://github.com/protocolbuffers/protobuf/releases/download/v30.2/protoc-30.2-linux-x86_64.zip
+protoc_version=30.2
+if ! [ -f protoc-$protoc_version-linux-x86_64.zip ]; then
+    curl -LO  \
+        https://github.com/protocolbuffers/protobuf/releases/download/v$protoc_version/protoc-$protoc_version-linux-x86_64.zip
+fi
 mkdir -p ~/.local
-unzip protoc-30.2-linux-x86_64.zip -d $HOME/.local
+unzip protoc-$protoc_version-linux-x86_64.zip -d $HOME/.local
 export PATH+=:~/.local/bin
 protoc --version
 
