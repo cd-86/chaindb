@@ -21,6 +21,7 @@ var blockCacheDetached sync.Map
 func pullOneBlock(blk_uuid uint32) (blk blockchain.Block, err error) {
 	cached_detached_block, exist := blockCacheDetached.Load(blk_uuid)
 	if exist {
+		log.Printf("拉取区块时命中缓存: BlockUUID=%d\n", blk_uuid)
 		return cached_detached_block.(blockchain.Block), nil
 	}
 
@@ -63,7 +64,8 @@ func pullOneBlock(blk_uuid uint32) (blk blockchain.Block, err error) {
 	}
 
 	err = blk.FromGob(<-block_request)
-	if err != nil {
+	if err == nil {
+		log.Printf("拉取到区块 BlockUUID=%d\n", blk_uuid)
 		blockCacheDetached.Store(blk_uuid, blk)
 	}
 	return
