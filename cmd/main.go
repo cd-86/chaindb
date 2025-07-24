@@ -14,6 +14,7 @@ import (
 func main() {
 	discovery.Start(chaindb_config.DiscoveryInterval)
 
+	validator.StartBlockDeliveryServer()
 	validator.StartTryPickBlocks(LocalChain)
 	blockchain.StartMining(LocalChain, &LocalTxPool, validator.Propose)
 
