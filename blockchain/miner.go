@@ -31,12 +31,12 @@ func StartMining(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
 			switch lower_threshold_percent := 10; {
 			case p < float64(lower_threshold_percent)/100.0:
 				log.Printf(
-					"网络中下一个区块生成的概率预估为 p=%.2f%% < %d%%!\n",
+					"[  Flip ] 网络中下一个区块生成的概率预估为 p=%.2f%% < %d%%!\n",
 					p*100, lower_threshold_percent,
 				)
 			case p > float64(100-lower_threshold_percent)/100.0:
 				log.Printf(
-					"网络中下一个区块生成的概率预估为 p=%.2f%% > %d%%!\n",
+					"[  Flip ] 网络中下一个区块生成的概率预估为 p=%.2f%% > %d%%!\n",
 					p*100, 100-lower_threshold_percent,
 				)
 			}
