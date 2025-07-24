@@ -10,20 +10,48 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: 'stable'
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+
+      - name: Install protoc-gen-go
+        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+
+      - name: Install protoc-gen-go-grpc
+        run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+      - name: Add Go bin to PATH
+        run: echo "$HOME/go/bin" >> $GITHUB_PATH
+
       - name: Build
-        run: go build -o chaindb.exe ./cmd
+        run: make chaindb.exe
 
   build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: 'stable'
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+
+      - name: Install protoc-gen-go
+        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+
+      - name: Install protoc-gen-go-grpc
+        run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+      - name: Add Go bin to PATH
+        run: echo "$env:USERPROFILE\go\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Build
-        run: go build -o chaindb.exe ./cmd
+        run: make chaindb.exe
