@@ -1,6 +1,8 @@
 SHELL = /bin/bash -O globstar
 
+
 chaindb.exe: \
+		always  \
 		./validator/block_cdn/service.pb.go  \
 		./validator/block_cdn/service_grpc.pb.go
 	go build -o chaindb.exe ./cmd
@@ -10,3 +12,5 @@ chaindb.exe: \
 		--go_out=.           --go_opt=module=github.com/shynur/chaindb  \
 		--go-grpc_out=. --go-grpc_opt=module=github.com/shynur/chaindb  \
 		$<
+
+.PHONY: always
