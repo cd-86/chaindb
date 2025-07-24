@@ -20,9 +20,8 @@ func main() {
 
 	for i := 0; i != 10_000; i++ {
 		tx := blockchain.Transaction{
-			OwnerID: rand.Uint32N(20000),
-			Nonce:   0,
-			Data:    "000000000000000000000000000",
+			OwnerID: rand.Uint32N(10),
+			Nonce:   10,
 		}
 		LocalTxPool.Add(tx)
 
