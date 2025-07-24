@@ -2,12 +2,9 @@ package validator
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"net"
-	"os"
 	"strconv"
-	"sync"
-	"time"
 
 	"github.com/shynur/chaindb/blockchain"
 	"github.com/shynur/chaindb/chaindb_config"
@@ -17,18 +14,14 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func pullOneBlock(blk_uuid uint32) (blockchain.Block, error) {
+func pullOneBlock(blk_uuid uint32) (blk blockchain.Block, err error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	block_request := make(chan []byte)
+	block_request := make(chan []byte, 1)
 
-	var requests sync.WaitGroup
 	for _, ip := range *discovery.ActiveNodes.Load() {
-		requests.Add(1)
 		go func() {
-			defer requests.Done()
-
 			conn, err := grpc.NewClient(
 				net.JoinHostPort(
 					ip.String(),
@@ -60,14 +53,8 @@ func pullOneBlock(blk_uuid uint32) (blockchain.Block, error) {
 		}()
 	}
 
-	select {
-	case buf := <-block_request:
-		fmt.Printf("Got result: %v\n", buf)
-	case <-time.After(5 * time.Second):
-		fmt.Fprintln(os.Stderr, "timeout")
-	}
-
-	requests.Wait()
+	err = blk.FromGob(<-block_request)
+	return
 }
 
 // head_uuid 块已经存在, 然后从 head_uuid 开始拉取.
@@ -91,5 +78,14 @@ func pull(chain *blockchain.Chain, head_uuid uint32) {
 		previous_uuid = previous_blk.ParentUUID
 	}
 
-	chain.TrySwitchHead(head_uuid)
+	if chain.TrySwitchHead(head_uuid) {
+		log.Printf(
+			"已切换到拉取自网络的更长链, HEAD.UUID=%d, HEAD.Height=%d\n",
+			head_uuid,
+			func() uint32 {
+				head, _ := blockchain.BlockCache.Load(head_uuid)
+				return head.(blockchain.Block).Height
+			}(),
+		)
+	}
 }

@@ -3,6 +3,8 @@
 ![代码行数统计徽章](https://tokei.rs/b1/github/shynur/chaindb?category=code&label=代%20码%20行%20数&style=flat)
 ![可成功构建的徽章](https://github.com/shynur/chaindb/actions/workflows/go-build.yaml/badge.svg)
 ![通过测试的徽章](https://github.com/shynur/chaindb/actions/workflows/go-test.yaml/badge.svg)
+![GoReportCard](https://goreportcard.com/badge/shynur/chaindb)
+<!--![codecov](https://codecov.io/gh/shynur/chaindb/graph/badge.svg)-->
 
 ## 介绍
 
@@ -130,19 +132,19 @@ AddTxLocally {
   - [x] 自动更新活跃节点的 IP 地址列表
     - [x] 基于 mDNS 的 Service Discovery
     - [ ] 连通性测试
-  - [ ] 网络环境测试
+  - [x] 网络环境测试
     - [ ] 切换网络
     - [ ] 断网重连
 - [ ] 区块链网络数据同步 (HTTP (JSON) 或 gRPC (protobuf))
-  - [ ] 广播自身链长
+  - [x] 广播自身链长
   - [ ] 请求其它节点的区块
     - [ ] 请求
     - [ ] 响应
 - [x] 数据结构设计
   - [x] 单条数据
   - [x] 区块
-  - [ ] 链表
-  - [ ] 矿池
+  - [x] 链表
+  - [x] 矿池
 - [ ] 查询 API
   - [ ] 添加订单 (HTTP)
   - [ ] 查询订单 (HTTP)
