@@ -32,5 +32,10 @@ protoc --version
 
 # 安装 gRPC.
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 export PATH+=:`go env GOPATH`/bin
 protoc-gen-go --version
+
+
+echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+echo '请执行  export PATH+=:~/.local/bin:`go env GOPATH`/bin'
