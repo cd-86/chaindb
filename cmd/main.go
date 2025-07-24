@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"math"
 	"math/rand/v2"
 	"time"
 
@@ -18,15 +19,21 @@ func main() {
 	validator.StartTryPickBlocks(LocalChain)
 	blockchain.StartMining(LocalChain, &LocalTxPool, validator.Propose)
 
-	for i := 0; i != 20_000; i++ {
+	go func() {
+		for ; ; time.Sleep(15 * time.Second) {
+			log.Println("[ Chain ] 全量最长区块链 ", LocalChain)
+		}
+	}()
+	const loop_cnt = 100_0000
+	for range loop_cnt {
+		const num_owners = 20
 		tx := blockchain.Transaction{
-			OwnerID: rand.Uint32N(20),
-			Nonce:   rand.Uint32N(20),
+			OwnerID: rand.Uint32N(num_owners),
+			Nonce: rand.Uint32N(
+				1 + uint32(math.Sqrt(loop_cnt/num_owners)),
+			),
 		}
 		LocalTxPool.Add(tx)
-
-		time.Sleep(time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
-
-	fmt.Println(LocalChain)
 }
