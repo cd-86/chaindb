@@ -1,6 +1,8 @@
 package blockchain
 
 import (
+	"bytes"
+	"encoding/gob"
 	"errors"
 	"slices"
 	"sync"
@@ -54,4 +56,14 @@ func (blk Block) Previous() (previous Block, err error) {
 	previous_, _ := BlockCache.Load(blk.ParentUUID)
 	previous = previous_.(Block)
 	return
+}
+
+func (blk Block) ToGob() []byte {
+	var obj bytes.Buffer
+	gob.NewEncoder(&obj).Encode(blk)
+	return obj.Bytes()
+}
+func (blk *Block) FromGob(obj []byte) error {
+	err := gob.NewDecoder(bytes.NewBuffer(obj)).Decode(blk)
+	return err
 }

@@ -1,8 +1,6 @@
 package validator
 
 import (
-	"bytes"
-	"encoding/gob"
 	"log"
 	"net"
 	"strconv"
@@ -13,9 +11,8 @@ import (
 )
 
 func Propose(blk blockchain.Block) {
-	var blk_obj bytes.Buffer
-	gob.NewEncoder(&blk_obj).Encode(blk)
-	log.Printf("即将被广播的区块: size=%dB\n", blk_obj.Len())
+	blk_obj := blk.ToGob()
+	log.Printf("即将被广播的区块: size=%dB\n", len(blk_obj))
 
 	for _, ip_addr := range *discovery.ActiveNodes.Load() {
 		go func() {
@@ -27,7 +24,7 @@ func Propose(blk blockchain.Block) {
 				),
 			)
 			defer conn.Close()
-			conn.Write(blk_obj.Bytes())
+			conn.Write(blk_obj)
 		}()
 	}
 }

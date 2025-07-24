@@ -1,8 +1,6 @@
 package validator
 
 import (
-	"bytes"
-	"encoding/gob"
 	"log"
 	"net"
 	"strconv"
@@ -35,10 +33,8 @@ func StartTryPickBlocks(chain *blockchain.Chain) {
 				log.Printf("接收到其它矿工开采的区块: size=%dB\n", n)
 			}
 
-			blk_obj = blk_obj[:n]
-
 			var blk blockchain.Block
-			gob.NewDecoder(bytes.NewBuffer(blk_obj)).Decode(&blk)
+			blk.FromGob(blk_obj[:n])
 			blockchain.BlockCache.Store(blk.UUID, blk)
 
 			if blk.Height > chain.Head().Height {
