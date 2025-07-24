@@ -14,9 +14,10 @@ import (
 	"github.com/shynur/chaindb/discovery"
 	"github.com/shynur/chaindb/validator/block_cdn"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-func pullOneBlock(blk_uuid uint32) error {
+func pullOneBlock(blk_uuid uint32) (blockchain.Block, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -28,32 +29,33 @@ func pullOneBlock(blk_uuid uint32) error {
 		go func() {
 			defer requests.Done()
 
-			conn, err := grpc.DialContext(
-				ctx,
+			conn, err := grpc.NewClient(
 				net.JoinHostPort(
 					ip.String(),
 					strconv.Itoa(chaindb_config.TCPPortBlockPCDN),
 				),
-				grpc.WithInsecure(),
-				grpc.WithBlock(),
-				grpc.WithTimeout(2*time.Second),
+				grpc.WithTransportCredentials(insecure.NewCredentials()),
 			)
 			if err != nil {
 				return
+			} else {
+				defer conn.Close()
 			}
-			defer conn.Close()
+
 			client := block_cdn.NewBlockDeliveryClient(conn)
+
 			resp, err := client.GetBlock(
 				ctx,
 				&block_cdn.BlockUUID{UUID: blk_uuid},
 			)
-			if err == nil {
-				// 只发送第一个结果
-				select {
-				case block_request <- resp.Buffer:
-					cancel() // 取消其它 goroutine
-				default:
-				}
+			if err != nil {
+				return
+			}
+
+			select {
+			case block_request <- resp.Buffer:
+				cancel()
+			default:
 			}
 		}()
 	}
@@ -80,13 +82,13 @@ func pull(chain *blockchain.Chain, head_uuid uint32) {
 			break
 		}
 
-		err := pullOneBlock(previous_uuid)
+		previous_blk, err := pullOneBlock(previous_uuid)
 		if err != nil {
 			return
 		}
 
-		previous_blk, _ := blockchain.BlockCache.Load(previous_uuid)
-		previous_uuid = previous_blk.(blockchain.Block).ParentUUID
+		blockchain.BlockCache.Store(previous_uuid, previous_blk)
+		previous_uuid = previous_blk.ParentUUID
 	}
 
 	chain.TrySwitchHead(head_uuid)
