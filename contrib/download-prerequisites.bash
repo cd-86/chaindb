@@ -26,7 +26,7 @@ if ! [ -f protoc-$protoc_version-linux-x86_64.zip ]; then
         https://github.com/protocolbuffers/protobuf/releases/download/v$protoc_version/protoc-$protoc_version-linux-x86_64.zip
 fi
 mkdir -p ~/.local
-unzip protoc-$protoc_version-linux-x86_64.zip -d $HOME/.local
+unzip -o protoc-$protoc_version-linux-x86_64.zip -d $HOME/.local
 export PATH+=:~/.local/bin
 protoc --version
 
