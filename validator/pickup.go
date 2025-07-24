@@ -27,18 +27,18 @@ func StartTryPickBlocks(chain *blockchain.Chain) {
 			n, _, _ := conn.ReadFrom(blk_obj)
 
 			if n >= len(blk_obj) {
-				log.Printf("接收到的区块数据过大, 被丢弃!\n")
+				log.Printf("[  Pull ] 接收到的区块数据过大, 被丢弃!\n")
 				continue
 			} else {
-				log.Printf("接收到其它矿工开采的区块: size=%dB\n", n)
+				log.Printf("[  Pull ] 接收到其它矿工开采的区块: size=%dB\n", n)
 			}
 
-			var blk blockchain.Block
-			blk.FromGob(blk_obj[:n])
-			blockchain.BlockCache.Store(blk.UUID, blk)
+			var head blockchain.Block
+			head.FromGob(blk_obj[:n])
+			blockCacheDetached.Store(head.UUID, head)
 
-			if blk.Height > chain.Head().Height {
-				go pull(chain, blk.UUID)
+			if head.Height > chain.Head().Height {
+				go pull(chain, head)
 			}
 		}
 	}()

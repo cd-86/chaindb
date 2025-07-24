@@ -45,7 +45,7 @@ func FindAll(timeout time.Duration) []net.IP {
 						nodes_list_lock.Lock()
 						defer nodes_list_lock.Unlock()
 						discovered_nodes = append(discovered_nodes, addr)
-						log.Printf("已发现 %s\n", addr)
+						log.Printf("[ DNS-SD] 已发现 %s\n", addr)
 					}
 				}()
 			}

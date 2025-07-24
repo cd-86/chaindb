@@ -15,7 +15,7 @@ import (
 )
 
 func StartBlockDeliveryServer() {
-	log.Printf("正在启动区块 PCDN 服务器...")
+	log.Printf("[  PCDN ] 正在启动区块 PCDN 服务器...")
 
 	listener, err := net.Listen(
 		"tcp",
@@ -27,7 +27,7 @@ func StartBlockDeliveryServer() {
 	if err != nil {
 		panic(err)
 	}
-	log.Printf("区块 PCDN 服务器开始监听端口: %d", chaindb_config.TCPPortBlockPCDN)
+	log.Printf("[  PCDN ] 区块 PCDN 服务器开始监听端口: %d", chaindb_config.TCPPortBlockPCDN)
 
 	server := grpc.NewServer()
 	block_cdn.RegisterBlockDeliveryServer(
@@ -36,7 +36,7 @@ func StartBlockDeliveryServer() {
 	)
 	go server.Serve(listener)
 
-	log.Printf("区块 PCDN 服务器正常运行")
+	log.Printf("[  PCDN ] 区块 PCDN 服务器正常运行")
 }
 
 type blockPCDNServer struct {

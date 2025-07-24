@@ -73,11 +73,10 @@ func pullOneBlock(blk_uuid uint32) (blk blockchain.Block, err error) {
 
 // head_uuid 块已经存在, 然后从 head_uuid 开始拉取.
 // 如果够长, 则 switch 到该 head_uuid.
-func pull(chain *blockchain.Chain, head_uuid uint32) {
-	candidates := []blockchain.Block{}
+func pull(chain *blockchain.Chain, head blockchain.Block) {
+	candidates := []blockchain.Block{head}
 
-	head, _ := blockchain.BlockCache.Load(head_uuid)
-	previous_uuid := head.(blockchain.Block).ParentUUID
+	previous_uuid := head.ParentUUID
 
 	for {
 		_, exist := blockchain.BlockCache.Load(previous_uuid)
@@ -119,14 +118,11 @@ func pull(chain *blockchain.Chain, head_uuid uint32) {
 	for _, c := range candidates {
 		blockchain.BlockCache.Store(c.UUID, c)
 	}
-	if chain.TrySwitchHead(head_uuid) {
+	if chain.TrySwitchHead(head.UUID) {
 		log.Printf(
-			"已切换到拉取自网络的更长链, HEAD.UUID=%d, HEAD.Height=%d\n",
-			head_uuid,
-			func() uint32 {
-				head, _ := blockchain.BlockCache.Load(head_uuid)
-				return head.(blockchain.Block).Height
-			}(),
+			"[  Pull ] 已切换到拉取自网络的更长链, HEAD.UUID=%d, HEAD.Height=%d\n",
+			head.UUID,
+			head.Height,
 		)
 	}
 	go func() {

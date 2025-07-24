@@ -12,7 +12,7 @@ import (
 
 func Propose(blk blockchain.Block) {
 	blk_obj := blk.ToGob()
-	log.Printf("即将被广播的区块: size=%dB\n", len(blk_obj))
+	log.Printf("[Propose] 即将被广播的区块: size=%dB\n", len(blk_obj))
 
 	for _, ip_addr := range *discovery.ActiveNodes.Load() {
 		go func() {

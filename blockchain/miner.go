@@ -11,7 +11,7 @@ import (
 )
 
 func StartMining(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
-	log.Printf("启动矿工...\n")
+	log.Printf("[ Miner ] 启动矿工...\n")
 
 	go func() {
 		const check_interval = chaindb_config.BlockTime / 2
@@ -44,9 +44,9 @@ func StartMining(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
 			// 当前节点生成新区块的概率:
 			p /= float64(len(*discovery.ActiveNodes.Load())) + 1
 
-			log.Printf("本机在当前检查点 (间隔期望 BlockTime 的一半) 产生区块的概率为: %.2f%%\n", p*100)
+			log.Printf("[  Flip ] 本机在当前检查点 (间隔期望 BlockTime 的一半) 产生区块的概率为: %.2f%%\n", p*100)
 			if rand.Float64() < p {
-				log.Println("开采新区块...")
+				log.Println("[ Miner ] 开采新区块...")
 				BuildBlockTryAppend(chain, tx_pool, proposer)
 			}
 		}
@@ -79,7 +79,7 @@ func BuildBlockTryAppend(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
 	}
 
 	BlockCache.Store(blk.UUID, blk)
-	log.Printf("已开采新区块, UUID=%d, Height=%d\n", blk.UUID, blk.Height)
+	log.Printf("[ Miner ] 已开采新区块, UUID=%d, Height=%d\n", blk.UUID, blk.Height)
 	if chain.TrySwitchHead(blk.UUID) {
 		go proposer(blk)
 	}
