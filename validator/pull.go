@@ -124,7 +124,7 @@ func pull(chain *blockchain.Chain, head blockchain.Block) {
 	}
 	if chain.TrySwitchHead(head.UUID) {
 		log.Printf(
-			"[  Pull ] 已切换到拉取自网络的更长链, HEAD.UUID=%d, HEAD.Height=%d\n",
+			"[ Switch] 已切换到拉取自网络的更长链, HEAD.UUID=%d, HEAD.Height=%d\n",
 			head.UUID,
 			head.Height,
 		)
