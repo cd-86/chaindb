@@ -23,3 +23,8 @@ mkdir -p ~/.local
 unzip protoc-30.2-linux-x86_64.zip -d $HOME/.local
 export PATH+=:~/.local/bin
 protoc --version
+
+# 安装 gRPC.
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+export PATH+=:`go env GOPATH`/bin
+protoc-gen-go --version
