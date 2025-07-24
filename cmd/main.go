@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math"
 	"math/rand/v2"
 	"time"
@@ -21,7 +20,7 @@ func main() {
 
 	go func() {
 		for ; ; time.Sleep(15 * time.Second) {
-			log.Println("[ Chain ] 可见的全量最长区块链 ", LocalChain)
+			//log.Println("[ Chain ] 可见的全量最长区块链 ", LocalChain)
 		}
 	}()
 	const loop_cnt = 100_0000
