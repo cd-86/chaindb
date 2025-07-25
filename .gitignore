@@ -12,3 +12,5 @@ $RECYCLE.BIN/
 ?*.exe
 
 ?*.pb.go
+
+/coverage.txt  # codecov
