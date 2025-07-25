@@ -1,4 +1,5 @@
 #! /bin/bash
+# 从 GitHub 同步, 保证 CNB 的 commit 不会比 GitHub 更新.
 
 cd `dirname "$0"`/..
 
