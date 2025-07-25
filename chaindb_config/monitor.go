@@ -1,3 +1,4 @@
 package chaindb_config
 
-const TCPPortTxService = 56780
+// 监控与管理单个节点的服务端口, 采用 HTTP.
+const TCPPortMonitor = 56780
