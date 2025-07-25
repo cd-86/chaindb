@@ -75,11 +75,11 @@ ChainDB 不提供指导, 用户应根据实际使用环境决定 `ConfirmationSc
 GetLocalOwners
 ```
 
-返回 `Owners[{ConfirmationScore: <uint>, OwnerID: <uint>}, ...]`:
+返回 `Owners[{ConfirmationScore: <int>, OwnerID: <uint>}, ...]`:
 
 ```C++
 struct /* Owner (匿名类) */ {
-    std::uint32_t ConfirmationScore;
+    std::int32_t ConfirmationScore;
     std::uint32_t OwnerID;
     // ... 其余的供内部使用的成员变量 ...
 };
@@ -97,11 +97,11 @@ return std::vector</* Owner (匿名类) */>{
 GetLocalTxOwnedBy <OwnerID>
 ```
 
-返回 `Transactions[{ConfirmationScore: <uint>, Data: "..."}, ...]`:
+返回 `Transactions[{ConfirmationScore: <int>, Data: "..."}, ...]`:
 
 ```C++
 struct /* 事务类型 (匿名类) */ {
-    std::uint32_t ConfirmationScore;
+    std::int32_t ConfirmationScore;
     std::string Data;
     // ... 其余的供内部使用的成员变量 ...
 };
@@ -117,7 +117,7 @@ return std::vector</* 事务类型 (匿名类) */>{
 
 ```
 AddTxLocally {
-    RequiredConfirmationScore: <uint>,
+    RequiredConfirmationScore: <int>,
     Transaction: {OwnerID: <uint>, Data: "..."}
 }
 ```
@@ -126,7 +126,7 @@ AddTxLocally {
 
 此处 `RequiredConfirmationScore` 是一个用于控制同步时间的参数.
 数值越大, 阻塞越久, 但 transaction 被刻进区块链的概率越大;
-该值为 0 表示非阻塞调用, 你可将该值设为 0, 然后手动检查.
+该值为 -1 表示非阻塞调用, 你可将该值设为 -1, 然后手动检查.
 
 ## 进度
 
