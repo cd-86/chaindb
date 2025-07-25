@@ -37,5 +37,6 @@ export PATH+=:`go env GOPATH`/bin
 protoc-gen-go --version
 
 
-echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-echo '请执行  export PATH+=:~/.local/bin:`go env GOPATH`/bin'
+echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+echo '请执行'
+echo 'export PATH+=:/usr/local/go/bin:~/.local/bin:`/usr/local/go/bin/go env GOPATH`/bin'
