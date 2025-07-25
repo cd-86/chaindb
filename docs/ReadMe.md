@@ -1,4 +1,4 @@
-# ChainDB: 基于区块链的 可信任网络下 键值存储型 内存数据库
+# ChainDB: 基于区块链的键值存储型数据库
 
 <div align="center">
 
@@ -10,6 +10,21 @@
 ![GoReportCard](https://goreportcard.com/badge/shynur/chaindb)
 
 </div>
+
+## Features
+
+- 完全去中心化
+- 自动发现
+- 规模动态变化, 任意未知节点可随时加入或离开
+- 最终一致性
+- 原子性修改
+- 秒级可见性
+- 0 内存泄漏
+- 高并发
+- 跨平台 (GNU/Linux, MS-Windows)
+- 支持 IPv6
+- 单一节点可作为跳板联通两个网络
+- 低内存占用
 
 ## 介绍
 
