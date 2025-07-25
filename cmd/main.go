@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"math"
 	"math/rand/v2"
 	"time"
@@ -20,12 +22,16 @@ func main() {
 
 	go func() {
 		for ; ; time.Sleep(15 * time.Second) {
-			//log.Println("[ Chain ] 可见的全量最长区块链 ", LocalChain)
+			var blocks string
+			for _, blk := range LocalChain.Snapshot() {
+				blocks += fmt.Sprintf("%+v\n", blk)
+			}
+			log.Printf("[ Chain ] 可见的全量最长区块链:\n%s\n", blocks)
 		}
 	}()
 	const loop_cnt = 100_0000
 	for range loop_cnt {
-		const num_owners = 20
+		const num_owners = 200
 		tx := blockchain.Transaction{
 			OwnerID: rand.Uint32N(num_owners),
 			Nonce: rand.Uint32N(
@@ -33,6 +39,6 @@ func main() {
 			),
 		}
 		LocalTxPool.Add(tx)
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 }

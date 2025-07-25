@@ -1,7 +1,6 @@
 package blockchain
 
 import (
-	"fmt"
 	"math/rand/v2"
 	"slices"
 	"sync/atomic"
@@ -19,7 +18,7 @@ func (chain *Chain) Head() Block {
 	return head.(Block)
 }
 
-func (chain *Chain) String() string {
+func (chain *Chain) Snapshot() []Block {
 	reversed_chain := []Block{chain.Head()}
 	for reversed_chain[len(reversed_chain)-1].UUID != 0 {
 		previous, _ := reversed_chain[len(reversed_chain)-1].Previous()
@@ -30,7 +29,7 @@ func (chain *Chain) String() string {
 	}
 	slices.Reverse(reversed_chain)
 
-	return fmt.Sprintf("%+v", reversed_chain)
+	return reversed_chain
 }
 
 func New() *Chain {
