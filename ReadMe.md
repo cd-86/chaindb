@@ -2,11 +2,12 @@
 
 <div align="center">
 
-![可成功构建的徽章](https://github.com/shynur/chaindb/actions/workflows/go-build.yaml/badge.svg)
-![通过测试的徽章](https://github.com/shynur/chaindb/actions/workflows/go-test.yaml/badge.svg)
-![GoReportCard](https://goreportcard.com/badge/shynur/chaindb)  <!-- ![codecov](https://codecov.io/gh/shynur/chaindb/graph/badge.svg) -->  <br />
+[![可成功构建的徽章](https://github.com/shynur/chaindb/actions/workflows/go-build.yaml/badge.svg)](https://github.com/shynur/chaindb/actions/workflows/go-build.yaml)
+[![通过测试的徽章](https://github.com/shynur/chaindb/actions/workflows/go-test.yaml/badge.svg)](https://github.com/shynur/chaindb/actions/workflows/go-test.yaml)
+![测试覆盖率](https://codecov.io/gh/shynur/chaindb/graph/badge.svg)  <br />
 ![代码行数统计徽章](https://tokei.rs/b1/github/shynur/chaindb?category=lines&label=代%20码%20行%20数&style=flat)  <!-- category=code 更真实 -->
 ![文件数统计徽章](https://tokei.rs/b1/github/shynur/chaindb?category=files&label=文%20件%20数%20目&style=flat)
+![GoReportCard](https://goreportcard.com/badge/shynur/chaindb)
 
 </div>
 
