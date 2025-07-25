@@ -11,7 +11,7 @@ cd /tmp/shynur/chaindb.git
 git reset --hard origin/HEAD
 ln -s ./docs/ReadMe.md ReadMe.md
 git add ReadMe.md
-git commit -m '为 CNB 添加仓库及 ReadMe 文件'
+git commit -m '为 CNB 添加仓库级 ReadMe 文件'
 
 git remote set-url origin https://cnb.cool/shynur/chaindb.git
 git push -f
