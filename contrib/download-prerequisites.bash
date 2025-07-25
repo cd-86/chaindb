@@ -1,7 +1,17 @@
 #! /bin/bash
 
-if [ linux-gnu != $OSTYPE ]; then
-    echo "该脚本只适用于 GNU+Linux"
+go_version=1.24.5
+protoc_version=30.2
+
+if [ x86_64-pc-msys = $MACHTYPE ]; then
+    echo "1. 安装 Go 工具链: <https://dl.google.com/go/go$go_version.windows-amd64.msi>"
+    echo "2. 安装 protoc: <https://github.com/protocolbuffers/protobuf/releases/download/v$protoc_version/protoc-$protoc_version-win64.zip>"
+    echo '3. 执行: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest'
+    echo '         go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest'
+    echo '4. 环境变量该加的记得加'
+    exit
+elif [ x86_64-pc-linux-gnu != $MACHTYPE ] && [ x86_64-pc-msys = $MACHTYPE ]; then
+    echo "该脚本不适用于你的平台"
     exit 1
 fi
 
@@ -10,7 +20,6 @@ mkdir -p shynur/Downloads
 cd shynur/Downloads
 
 # 安装 Go 工具链.
-go_version=1.24.5
 export PATH+=:/usr/local/go/bin
 if ! go version | grep -F $go_version >/dev/null; then
     sudo rm -rf /usr/local/go
@@ -23,7 +32,6 @@ fi
 go version
 
 # 安装 protoc.
-protoc_version=30.2
 mkdir -p ~/.local
 export PATH+=:~/.local/bin
 if ! protoc --version | grep -F $protoc_version >/dev/null; then
