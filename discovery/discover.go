@@ -12,10 +12,10 @@ import (
 	"github.com/shynur/chaindb/chaindb_config"
 )
 
-func FindAll(timeout time.Duration) []net.IP {
+func FindAll(timeout time.Duration) (hosts []string) {
 	var (
-		nodes_list_lock  sync.Mutex
-		discovered_nodes []net.IP
+		hosts_          []string
+		hosts_list_lock sync.Mutex
 	)
 
 	entries := make(chan *zeroconf.ServiceEntry)
@@ -42,9 +42,9 @@ func FindAll(timeout time.Duration) []net.IP {
 						return
 					}
 					if has_been_added.CompareAndSwap(false, true) {
-						nodes_list_lock.Lock()
-						defer nodes_list_lock.Unlock()
-						discovered_nodes = append(discovered_nodes, addr)
+						hosts_list_lock.Lock()
+						defer hosts_list_lock.Unlock()
+						hosts_ = append(hosts_, addr.String())
 						log.Printf("[ DNS-SD] 已发现 %s\n", addr)
 					}
 				}()
@@ -66,7 +66,7 @@ func FindAll(timeout time.Duration) []net.IP {
 
 	<-ctx.Done()
 
-	nodes_list_lock.Lock()
-	defer nodes_list_lock.Unlock()
-	return discovered_nodes
+	hosts_list_lock.Lock()
+	defer hosts_list_lock.Unlock()
+	return hosts_
 }

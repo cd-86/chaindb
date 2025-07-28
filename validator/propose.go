@@ -14,12 +14,12 @@ func Propose(blk blockchain.Block) {
 	blk_obj := blk.ToGob()
 	log.Printf("[Propose] 即将被广播的区块: size=%dB\n", len(blk_obj))
 
-	for _, ip_addr := range *discovery.ActiveNodes.Load() {
+	for _, host := range *discovery.ActiveNodes.Load() {
 		go func() {
 			conn, _ := net.Dial(
 				"udp",
 				net.JoinHostPort(
-					ip_addr.String(),
+					host,
 					strconv.Itoa(chaindb_config.UDPPortPickBlock),
 				),
 			)

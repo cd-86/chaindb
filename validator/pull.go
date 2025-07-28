@@ -30,11 +30,11 @@ func pullOneBlock(blk_uuid uint32) (blk blockchain.Block, err error) {
 
 	block_request := make(chan []byte, 1)
 
-	for _, ip := range *discovery.ActiveNodes.Load() {
+	for _, host := range *discovery.ActiveNodes.Load() {
 		go func() {
 			conn, err := grpc.NewClient(
 				net.JoinHostPort(
-					ip.String(),
+					host,
 					strconv.Itoa(chaindb_config.TCPPortBlockPCDN),
 				),
 				grpc.WithTransportCredentials(insecure.NewCredentials()),

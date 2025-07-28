@@ -9,8 +9,9 @@ func Start(interval time.Duration) {
 	Register(interval)
 	go func() {
 		for {
-			nodes := FindAll(interval)
-			ActiveNodes.Store(&nodes)
+			discovered_nodes := FindAll(interval)
+			all_nodes := append(discovered_nodes, UserSpecifiedNodes.List()...)
+			ActiveNodes.Store(&all_nodes)
 		}
 	}()
 }
