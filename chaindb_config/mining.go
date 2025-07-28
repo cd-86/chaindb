@@ -16,7 +16,9 @@ const BlockTime = 1 * time.Second
 // 该值可以自己指定, 当前实现是使用主机名和一个随机整数.
 var MinerAddress = func() string {
 	hostname, err := os.Hostname()
+	// 你妈的主机名里面还不能有 点号, 不然 DNS-SD 会注册失败.
 	short_hostname := strings.SplitN(hostname, ".", 2)[0]
+
 	if err != nil {
 		panic(err)
 	}
