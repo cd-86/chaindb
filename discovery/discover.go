@@ -3,7 +3,6 @@ package discovery
 import (
 	"context"
 	"log"
-	"net"
 	"slices"
 	"sync"
 	"sync/atomic"
@@ -29,8 +28,7 @@ func FindAll(timeout time.Duration) (hosts []string) {
 			var has_been_added atomic.Bool
 			for _, addr := range append(
 				entry.AddrIPv4,
-				[]net.IP{}...,
-			// entry.AddrIPv6...,  // 路由器可能不支持 IPv6 吧, 主要是我不确定 'IPv6:port' 咋正确书写.
+				entry.AddrIPv6...,
 			) {
 				if isLocalIP(addr) {
 					continue
