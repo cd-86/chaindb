@@ -4,6 +4,7 @@ import (
 	"math/rand/v2"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -15,8 +16,9 @@ const BlockTime = 1 * time.Second
 // 该值可以自己指定, 当前实现是使用主机名和一个随机整数.
 var MinerAddress = func() string {
 	hostname, err := os.Hostname()
+	short_hostname := strings.SplitN(hostname, ".", 2)[0]
 	if err != nil {
 		panic(err)
 	}
-	return hostname + "-" + strconv.Itoa(rand.Int())
+	return short_hostname + "-" + strconv.Itoa(rand.Int())
 }()
