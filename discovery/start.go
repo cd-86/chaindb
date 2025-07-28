@@ -1,6 +1,7 @@
 package discovery
 
 import (
+	"slices"
 	"time"
 )
 
@@ -9,9 +10,11 @@ func Start(interval time.Duration) {
 	Register(interval)
 	go func() {
 		for {
-			discovered_nodes := FindAll(interval)
-			all_nodes := append(discovered_nodes, UserSpecifiedNodes.List()...)
-			ActiveNodes.Store(&all_nodes)
+			all_peers := slices.Concat(
+				FindAll(interval),
+				AdministratorSpecifiedNodes.List(),
+			)
+			ActiveNodes.Store(&all_peers)
 		}
 	}()
 }

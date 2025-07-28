@@ -14,13 +14,14 @@ var ActiveNodes = func() *atomic.Pointer[[]string] {
 	return &p
 }() // 不包括自己.
 
-var UserSpecifiedNodes = func() (
+var AdministratorSpecifiedNodes = func() (
 	nodes struct {
-		hosts  []string
-		lock   sync.RWMutex
-		Add    func(host []string)
-		Remove func(host []string)
-		List   func() []string
+		hosts      []string
+		lock       sync.RWMutex
+		Add        func(host []string)
+		Remove     func(host []string)
+		List       func() []string
+		ListActive func() []string
 	},
 ) {
 	nodes.Add = func(hosts []string) {
@@ -28,6 +29,7 @@ var UserSpecifiedNodes = func() (
 		defer nodes.lock.Unlock()
 		nodes.hosts = append(nodes.hosts, hosts...)
 	}
+
 	nodes.Remove = func(hosts []string) {
 		new_hosts_list := slices.DeleteFunc(
 			slices.Clone(nodes.hosts),
@@ -39,10 +41,16 @@ var UserSpecifiedNodes = func() (
 		defer nodes.lock.Unlock()
 		nodes.hosts = new_hosts_list
 	}
+
 	nodes.List = func() []string {
 		nodes.lock.RLock()
 		defer nodes.lock.RUnlock()
 		return slices.Clone(nodes.hosts)
 	}
+
+	nodes.ListActive = func() []string {
+
+	}
+
 	return
 }()

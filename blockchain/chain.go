@@ -12,6 +12,67 @@ import (
 // 区块链最后一个区块的 UUID.
 type Chain atomic.Uint32
 
+// 按插入顺序返回.
+func (chain *Chain) ListOwners() (
+	owners []struct {
+		OwnerID           uint32
+		ConfirmationScore uint32
+	},
+) {
+	owners_earliest_tx := make(map[uint32]struct {
+		ConfirmationScore uint32
+		Age               uint32
+	})
+	head := chain.Head()
+	num_txs := uint32(0)
+	for blk := head; blk.UUID != 0; blk, _ = blk.Previous() {
+		for _, tx := range func() []Transaction {
+			transactions := slices.Clone(blk.Transactions)
+			slices.Reverse(blk.Transactions)
+			return transactions
+		}() {
+			owners_earliest_tx[tx.OwnerID] = struct {
+				ConfirmationScore uint32
+				Age               uint32
+			}{
+				ConfirmationScore: head.Height - blk.Height,
+				Age:               num_txs,
+			}
+
+			num_txs++
+		}
+	}
+
+	owners = []struct {
+		OwnerID           uint32
+		ConfirmationScore uint32
+	}{}
+	for owner, tx := range owners_earliest_tx {
+		owners = append(
+			owners,
+			struct {
+				OwnerID           uint32
+				ConfirmationScore uint32
+			}{
+				OwnerID:           owner,
+				ConfirmationScore: tx.ConfirmationScore,
+			},
+		)
+	}
+	slices.SortFunc(
+		owners,
+		func(owner1, owner2 struct {
+			OwnerID           uint32
+			ConfirmationScore uint32
+		}) int {
+			return -(int(owners_earliest_tx[owner1.OwnerID].Age) -
+				int(owners_earliest_tx[owner2.OwnerID].Age))
+		},
+	)
+
+	return
+}
+
 func (chain *Chain) Head() Block {
 	head_uuid := (*atomic.Uint32)(chain).Load()
 	head, _ := BlockCache.Load(head_uuid)
