@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -68,5 +69,5 @@ func FindAll(timeout time.Duration) (hosts []string) {
 
 	hosts_list_lock.Lock()
 	defer hosts_list_lock.Unlock()
-	return hosts_
+	return slices.Clone(hosts_)
 }
