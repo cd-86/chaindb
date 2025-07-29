@@ -27,6 +27,7 @@ func Propose(blk blockchain.Block) {
 				log.Printf("[Propose] 无法连接到 %s: %v\n", host, err)
 				return
 			}
+
 			defer conn.Close()
 			conn.Write(blk_obj)
 		}()
