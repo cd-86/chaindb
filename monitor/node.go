@@ -38,13 +38,16 @@ func peersHandler(w http.ResponseWriter, r *http.Request) {
 				}) bool) {
 					admin_specified := discovery.AdministratorSpecifiedNodes.List()
 					for _, host := range admin_specified {
-						yield(struct {
+						c := yield(struct {
 							Host                   string
 							AdministratorSpecified bool
 						}{
 							Host:                   host,
 							AdministratorSpecified: true,
 						})
+						if !c {
+							return
+						}
 					}
 
 					for _, peer := range *discovery.ActiveNodes.Load() {
@@ -55,13 +58,16 @@ func peersHandler(w http.ResponseWriter, r *http.Request) {
 							)
 							continue
 						}
-						yield(struct {
+						c := yield(struct {
 							Host                   string
 							AdministratorSpecified bool
 						}{
 							Host:                   peer,
 							AdministratorSpecified: false,
 						})
+						if !c {
+							return
+						}
 					}
 				},
 			),
