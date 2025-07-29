@@ -16,13 +16,17 @@ func Propose(blk blockchain.Block) {
 
 	for _, host := range *discovery.ActiveNodes.Load() {
 		go func() {
-			conn, _ := net.Dial(
+			conn, err := net.Dial(
 				"udp",
 				net.JoinHostPort(
 					host,
 					strconv.Itoa(chaindb_config.UDPPortPickBlock),
 				),
 			)
+			if err != nil {
+				log.Printf("[Propose] 无法连接到 %s: %v\n", host, err)
+				return
+			}
 			defer conn.Close()
 			conn.Write(blk_obj)
 		}()
