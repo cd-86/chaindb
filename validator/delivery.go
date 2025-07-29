@@ -29,7 +29,9 @@ func StartBlockDeliveryServer() {
 	}
 	log.Printf("[  PCDN ] 区块 PCDN 服务器开始监听端口: %d", chaindb_config.TCPPortBlockPCDN)
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+	// TODO: 不做流量控制了, 反正是可信任网络.
+	)
 	block_cdn.RegisterBlockDeliveryServer(
 		server,
 		&blockPCDNServer{},
