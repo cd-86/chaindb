@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-func registerChainService() {
-	http.HandleFunc("/head", getHeadHandler)
+func registerChainService(server *http.ServeMux) {
+	server.HandleFunc("/head", getHeadHandler)
 }
 
 // GET /head

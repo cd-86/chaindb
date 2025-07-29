@@ -9,9 +9,9 @@ import (
 	"github.com/shynur/chaindb/discovery"
 )
 
-func registerNodeService() {
-	http.HandleFunc("/peers", peersHandler)
-	http.HandleFunc("/peers/", func(w http.ResponseWriter, r *http.Request) {
+func registerNodeService(server *http.ServeMux) {
+	server.HandleFunc("/peers", peersHandler)
+	server.HandleFunc("/peers/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodDelete {
 			deletePeersHostHandler(w, r)
 		} else {

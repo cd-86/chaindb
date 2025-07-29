@@ -1,6 +1,7 @@
 package discovery
 
 import (
+	"log"
 	"slices"
 	"sync"
 	"sync/atomic"
@@ -43,6 +44,7 @@ var AdministratorSpecifiedNodes = func() struct {
 	}
 
 	Remove := func(hosts_to_rm []string) {
+		log.Printf("[Monitor] 管理员删除了节点: %v\n", hosts_to_rm)
 		lock.Lock()
 		defer lock.Unlock()
 		hosts = slices.DeleteFunc(

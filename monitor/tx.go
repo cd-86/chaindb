@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -9,31 +10,32 @@ import (
 	"github.com/shynur/chaindb/blockchain"
 )
 
-func registerTxService() {
-	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
+func registerTxService(server *http.ServeMux) {
+	server.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			postTransactionsHandler(w, r)
 		} else {
 			http.NotFound(w, r)
 		}
 	})
-	http.HandleFunc("/owners", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/owners" {
-			getOwnersHandler(w, r)
-			return
-		}
-		if parts := strings.Split(r.URL.Path, "/"); len(parts) == 4 &&
+	server.HandleFunc("/owners", getOwnersHandler)
+	server.HandleFunc("/owners/", func(w http.ResponseWriter, r *http.Request) {
+		parts := strings.Split(r.URL.Path, "/")
+
+		if len(parts) == 4 &&
 			parts[1] == "owners" &&
 			parts[3] == "transactions" {
 			getOwnersOwnerIDTransactionsHandler(w, r)
 			return
 		}
+
+		log.Printf("[Monitor] 无效的路径: %s\n", r.URL.Path)
 		http.NotFound(w, r)
 	})
 }
 
 // GET /owners
-func getOwnersHandler(w http.ResponseWriter, r *http.Request) {
+func getOwnersHandler(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(
 		theChain.ListOwners(),
 	)
@@ -47,6 +49,7 @@ func getOwnersOwnerIDTransactionsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	log.Printf("[Monitor] 正在请求交易记录 owned by %d\n", owner)
 	json.NewEncoder(w).Encode(
 		theChain.ListTxsOwnedBy(uint32(owner)),
 	)

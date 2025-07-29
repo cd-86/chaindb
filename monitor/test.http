@@ -1,17 +1,50 @@
-# -*- restclient -*-
+################ block #################
 
-# block
-GET http://localhost:56780/blocks/3680279193
+# 查询区块
+GET http://localhost:56780/blocks/0
 
-# chain
+################ chain #################
+
+# 查询节点当前正在从哪个区块往后挖矿
 GET http://localhost:56780/head
 
-# node
+################# node #################
+
+# 管理员手动添加一些节点
 POST http://localhost:56780/peers
+Content-Type: application/json
+
+[
+    "ubuntu.seer.host.shynur.fun",
+    "192.168.13.84"
+]
+
+# 查询节点目前已经发现了哪些其它节点, 以及管理员手动指定的那些节点
 GET http://localhost:56780/peers
 
+# 管理员手动删除先前手动添加的节点
+DELETE http://localhost:56780/peers/192.168.13.84
+
+################## tx ##################
+
+# 获取数据库里所有已注册的 owners
+GET http://localhost:56780/owners
+
+# 获取指定 owner 向数据库插入的数据
+GET http://localhost:56780/owners/42/transactions
+
+# 插入数据
+POST http://localhost:56780/transactions
+Content-Type: application/json
+
+{
+    "OwnerID": 42,
+    "Nonce": 15,
+    "Data": "owner=42 的第 0 条数据"
+}
 
 
 # Local Variables:
 # eval: (require 'restclient)  ; <https://melpa.org/#/restclient>
+# mode: restclient
 # End:

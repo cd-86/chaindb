@@ -9,8 +9,8 @@ import (
 	"github.com/shynur/chaindb/blockchain"
 )
 
-func registerBlockService() {
-	http.HandleFunc("/blocks/", getBlocksUUIDHandler)
+func registerBlockService(server *http.ServeMux) {
+	server.HandleFunc("/blocks/", getBlocksUUIDHandler)
 }
 
 // GET /blocks/[uuid]

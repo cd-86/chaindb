@@ -18,10 +18,12 @@ var (
 func Start(chain *blockchain.Chain, tx_pool *blockchain.TxPool) {
 	theChain, theTxPool = chain, tx_pool
 
-	registerTxService()
-	registerBlockService()
-	registerChainService()
-	registerNodeService()
+	server := http.NewServeMux()
+
+	registerTxService(server)
+	registerBlockService(server)
+	registerChainService(server)
+	registerNodeService(server)
 
 	go func() {
 		err := http.ListenAndServe(
@@ -29,7 +31,7 @@ func Start(chain *blockchain.Chain, tx_pool *blockchain.TxPool) {
 				"",
 				strconv.Itoa(chaindb_config.TCPPortMonitor),
 			),
-			nil,
+			server,
 		)
 		log.Printf("[Monitor] Error: %v\n", err)
 	}()
