@@ -17,7 +17,7 @@ type Block struct {
 
 	UUID       uint32 `json:"UUID"`
 	Height     uint32 `json:"Height"`
-	ParentUUID uint32 `json:"ParentUUID,omitempty"`
+	ParentUUID uint32 `json:"ParentUUID"`
 
 	Transactions []Transaction `json:"Transactions,omitempty"`
 }
