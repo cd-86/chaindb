@@ -3,6 +3,7 @@ package monitor
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/shynur/chaindb/blockchain"
@@ -19,9 +20,13 @@ func getBlocksUUIDHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	uuid := parts[2]
+	uuid, err := strconv.Atoi(parts[2])
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
 
-	block, ok := blockchain.BlockCache.Load(uuid)
+	block, ok := blockchain.BlockCache.Load(uint32(uuid))
 	if !ok {
 		http.NotFound(w, r)
 		return
