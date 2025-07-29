@@ -23,12 +23,14 @@ func Start(chain *blockchain.Chain, tx_pool *blockchain.TxPool) {
 	registerChainService()
 	registerNodeService()
 
-	err := http.ListenAndServe(
-		net.JoinHostPort(
-			"",
-			strconv.Itoa(chaindb_config.TCPPortMonitor),
-		),
-		nil,
-	)
-	log.Printf("[Monitor] Error: %v\n", err)
+	go func() {
+		err := http.ListenAndServe(
+			net.JoinHostPort(
+				"",
+				strconv.Itoa(chaindb_config.TCPPortMonitor),
+			),
+			nil,
+		)
+		log.Printf("[Monitor] Error: %v\n", err)
+	}()
 }
