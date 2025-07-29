@@ -155,7 +155,7 @@ AddTxLocally {
   - [x] 网络环境测试
     - [ ] 切换网络
     - [x] 断网重连
-- [ ] 区块链网络数据同步 (HTTP (JSON) 或 gRPC (protobuf))
+- [x] 区块链网络数据同步 (HTTP (JSON) 或 gRPC (protobuf))
   - [x] 广播自身链长
   - [x] 请求其它节点的区块
     - [x] 请求

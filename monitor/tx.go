@@ -5,26 +5,30 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/shynur/chaindb/blockchain"
 )
 
 func registerTxService() {
 	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			transactionCreateHandler(w, r)
+			postTransactionsHandler(w, r)
 		} else {
 			http.NotFound(w, r)
 		}
 	})
 	http.HandleFunc("/owners", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/owners" {
-			if strings.HasPrefix(r.URL.Path, "/owners/") && strings.HasSuffix(r.URL.Path, "/transactions") {
-				transactionListHandler(w, r)
-				return
-			}
-			http.NotFound(w, r)
+		if r.URL.Path == "/owners" {
+			getOwnersHandler(w, r)
 			return
 		}
-		ownerHandler(w, r)
+		if parts := strings.Split(r.URL.Path, "/"); len(parts) == 4 &&
+			parts[1] == "owners" &&
+			parts[3] == "transactions" {
+			getOwnersOwnerIDTransactionsHandler(w, r)
+			return
+		}
+		http.NotFound(w, r)
 	})
 }
 
@@ -49,14 +53,13 @@ func getOwnersOwnerIDTransactionsHandler(w http.ResponseWriter, r *http.Request)
 }
 
 // POST /transactions
-func transactionCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var t Transaction
-	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+func postTransactionsHandler(w http.ResponseWriter, r *http.Request) {
+	var tx blockchain.Transaction
+	if err := json.NewDecoder(r.Body).Decode(&tx); err != nil {
+		http.Error(w, "无法解析的 transaction", http.StatusBadRequest)
 		return
 	}
-	mtx.Lock()
-	transactionStore[t.OwnerID] = append(transactionStore[t.OwnerID], t)
-	mtx.Unlock()
+
+	theTxPool.Add(tx)
 	w.WriteHeader(http.StatusCreated)
 }
