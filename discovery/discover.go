@@ -45,9 +45,9 @@ func FindAllActive(timeout time.Duration) (hosts []string) {
 			}
 
 			var has_been_added atomic.Bool
-			for _, addr := range append(
+			for _, addr := range slices.Concat(
 				entry.AddrIPv4,
-				entry.AddrIPv6...,
+				// entry.AddrIPv6,
 			) {
 				if isLocalIP(addr) {
 					continue
