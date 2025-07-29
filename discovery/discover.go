@@ -77,7 +77,7 @@ func FindAllActive(timeout time.Duration) (hosts []string) {
 	if err != nil {
 		log.Fatalln("Failed to initialize resolver:", err)
 	}
-	err = resolver.Browse(ctx, "_shynur-chaindb._tcp", "local.", entries)
+	err = resolver.Browse(ctx, "_shynurChainDB._tcp", "local.", entries)
 	if err != nil {
 		log.Fatalln("Failed to browse:", err)
 	}

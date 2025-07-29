@@ -56,7 +56,7 @@ func Register(interval_checking_network time.Duration) {
 			}
 			server, _ = zeroconf.Register(
 				chaindb_config.MinerAddress,
-				"_shynur-chaindb._tcp", "local.", chaindb_config.DNSSDPort,
+				"_shynurChainDB._tcp", "local.", chaindb_config.DNSSDPort,
 				nil, new_ifcs,
 			)
 
