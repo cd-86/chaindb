@@ -6,10 +6,10 @@ import (
 )
 
 func registerChainService() {
-	http.HandleFunc("/head", headHandler)
+	http.HandleFunc("/head", getHeadHandler)
 }
 
 // GET /head
-func headHandler(w http.ResponseWriter, r *http.Request) {
+func getHeadHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(theChain.Head().UUID)
 }

@@ -10,66 +10,81 @@ import (
 )
 
 func registerNodeService() {
-	http.HandleFunc("/peers", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			peerListHandler(w, r)
-		case http.MethodPost:
-			peerCreateHandler(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
+	http.HandleFunc("/peers", peersHandler)
 	http.HandleFunc("/peers/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodDelete {
-			peerDeleteHandler(w, r)
+			deletePeersHostHandler(w, r)
 		} else {
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// GET /peers
-func peersHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(
-		slices.Collect(
-			func(yield func(v struct {
-				Host                   string
-				AdministratorSpecified bool
-			}) bool) {
-				admin_specified := discovery.AdministratorSpecifiedNodes.List()
-
-				for peer := range *discovery.ActiveNodes.Load() {
-
-				}
-			},
-		),
-	)
-}
-
-// POST /peers
-func peerCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var p Peer
-	if err := json.NewDecoder(r.Body).Decode(&p); err != nil || p.Host == "" {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
-	mtx.Lock()
-	peerStore[p.Host] = p
-	mtx.Unlock()
-	w.WriteHeader(http.StatusCreated)
-}
-
-// DELETE /peers/{host}
-func peerDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	parts := strings.Split(r.URL.Path, "/")
-	if len(parts) != 3 {
-		http.NotFound(w, r)
-		return
-	}
-	host := parts[2]
-	mtx.Lock()
-	delete(peerStore, host)
-	mtx.Unlock()
+// DELETE /peers/[host]
+func deletePeersHostHandler(w http.ResponseWriter, r *http.Request) {
+	host := strings.Split(r.URL.Path, "/")[2]
+	discovery.AdministratorSpecifiedNodes.Remove([]string{host})
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func peersHandler(w http.ResponseWriter, r *http.Request) {
+	// GET /peers
+	get := func() {
+		json.NewEncoder(w).Encode(
+			slices.Collect(
+				func(yield func(v struct {
+					Host                   string
+					AdministratorSpecified bool
+				}) bool) {
+					admin_specified := discovery.AdministratorSpecifiedNodes.List()
+					for _, host := range admin_specified {
+						yield(struct {
+							Host                   string
+							AdministratorSpecified bool
+						}{
+							Host:                   host,
+							AdministratorSpecified: true,
+						})
+					}
+
+					for _, peer := range *discovery.ActiveNodes.Load() {
+						if found := slices.Index(admin_specified, peer); found != -1 {
+							admin_specified = slices.Delete(
+								admin_specified,
+								found, found+1,
+							)
+							continue
+						}
+						yield(struct {
+							Host                   string
+							AdministratorSpecified bool
+						}{
+							Host:                   peer,
+							AdministratorSpecified: false,
+						})
+					}
+				},
+			),
+		)
+	}
+
+	// POST /peers
+	post := func() {
+		var new_nodes []string
+		if err := json.NewDecoder(r.Body).Decode(&new_nodes); err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+		discovery.AdministratorSpecifiedNodes.Add(new_nodes)
+		w.WriteHeader(http.StatusCreated)
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		get()
+	case http.MethodPost:
+		post()
+	default:
+		http.NotFound(w, r)
+	}
 }

@@ -3,6 +3,7 @@ package discovery
 import (
 	"context"
 	"log"
+	"net"
 	"slices"
 	"sync"
 	"sync/atomic"
@@ -12,11 +13,29 @@ import (
 	"github.com/shynur/chaindb/chaindb_config"
 )
 
-func FindAll(timeout time.Duration) (hosts []string) {
+func FindAllActive(timeout time.Duration) (hosts []string) {
 	var (
 		hosts_          []string
 		hosts_list_lock sync.Mutex
 	)
+
+	for _, admin_specified := range AdministratorSpecifiedNodes.List() {
+		go func() {
+			if isLocalIP(net.ParseIP(admin_specified)) {
+				log.Fatalf(
+					"用户指定的节点 <%s> 是本机 IP, 本该在 HTTP 端就被过滤掉才对啊.\n",
+					admin_specified,
+				)
+			}
+			if err := ping(admin_specified); err != nil {
+				return
+			}
+			hosts_list_lock.Lock()
+			defer hosts_list_lock.Unlock()
+			hosts_ = append(hosts_, admin_specified)
+			log.Printf("[Monitor] 用户指定节点 <%s> 是可达的\n", admin_specified)
+		}()
+	}
 
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(results <-chan *zeroconf.ServiceEntry) {

@@ -9,11 +9,11 @@ import (
 )
 
 func registerBlockService() {
-	http.HandleFunc("/blocks/", blocksUUIDHandler)
+	http.HandleFunc("/blocks/", getBlocksUUIDHandler)
 }
 
 // GET /blocks/[uuid]
-func blocksUUIDHandler(w http.ResponseWriter, r *http.Request) {
+func getBlocksUUIDHandler(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(r.URL.Path, "/")
 	if len(parts) != 3 {
 		http.NotFound(w, r)

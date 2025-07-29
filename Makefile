@@ -14,3 +14,9 @@ chaindb.exe: \
 		$<
 
 .PHONY: always
+
+.PHONY: clean
+clean:
+	rm -f ./**/?*.exe
+	rm -f ./**/?*.pb.go
+	rm -f ./coverage.txt

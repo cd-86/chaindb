@@ -12,6 +12,43 @@ import (
 // 区块链最后一个区块的 UUID.
 type Chain atomic.Uint32
 
+func (chain *Chain) ListTxsOwnedBy(owner uint32) (
+	txs []struct {
+		Tx                Transaction
+		ConfirmationScore uint32
+	},
+) {
+
+	var first_tx_found bool
+
+	head := chain.Head()
+	for blk := head; blk.UUID != 0; blk, _ = blk.Previous() {
+		for _, tx := range blk.Transactions {
+			if tx.OwnerID != owner {
+				continue
+			}
+			if tx.Nonce == 0 {
+				first_tx_found = true
+			}
+			txs = append(
+				txs,
+				struct {
+					Tx                Transaction
+					ConfirmationScore uint32
+				}{
+					Tx:                tx,
+					ConfirmationScore: head.Height - blk.Height,
+				},
+			)
+		}
+		if first_tx_found {
+			break
+		}
+	}
+
+	return
+}
+
 // 按插入顺序返回.
 func (chain *Chain) ListOwners() (
 	owners []struct {

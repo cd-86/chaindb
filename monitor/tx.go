@@ -2,8 +2,8 @@ package monitor
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -28,28 +28,24 @@ func registerTxService() {
 	})
 }
 
-// /owners
-func ownersHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode([]uint32{})
+// GET /owners
+func getOwnersHandler(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(
+		theChain.ListOwners(),
+	)
 }
 
-// /owners/{owner_id}/transactions
-func owners_TransactionsHandler(w http.ResponseWriter, r *http.Request) {
-	parts := strings.Split(r.URL.Path, "/")
-	if len(parts) != 4 {
-		http.NotFound(w, r)
-		return
-	}
-	ownerID := parts[2]
-	var id int
-	_, err := fmt.Sscanf(ownerID, "%d", &id)
+// GET /owners/{owner_id}/transactions
+func getOwnersOwnerIDTransactionsHandler(w http.ResponseWriter, r *http.Request) {
+	owner, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[2])
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
-	mtx.RLock()
-	defer mtx.RUnlock()
-	json.NewEncoder(w).Encode(transactionStore[id])
+
+	json.NewEncoder(w).Encode(
+		theChain.ListTxsOwnedBy(uint32(owner)),
+	)
 }
 
 // POST /transactions
