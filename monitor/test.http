@@ -1,0 +1,17 @@
+# -*- restclient -*-
+
+# block
+GET http://localhost:56780/blocks/3680279193
+
+# chain
+GET http://localhost:56780/head
+
+# node
+POST http://localhost:56780/peers
+GET http://localhost:56780/peers
+
+
+
+# Local Variables:
+# eval: (require 'restclient)  ; <https://melpa.org/#/restclient>
+# End:
