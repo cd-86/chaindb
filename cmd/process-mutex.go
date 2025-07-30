@@ -15,11 +15,11 @@ import (
 )
 
 var _ = func() any {
-	assertNoOtherChainDBInstance()
+	AssertNoOtherChainDBInstance()
 	return nil
 }()
 
-func assertNoOtherChainDBInstance() {
+func AssertNoOtherChainDBInstance() {
 	pid_file_path := filepath.Join(
 		func() string {
 			switch OS := runtime.GOOS; OS {
