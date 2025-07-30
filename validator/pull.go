@@ -3,6 +3,7 @@ package validator
 import (
 	"context"
 	"log"
+	"math"
 	"net"
 	"strconv"
 	"sync"
@@ -13,7 +14,6 @@ import (
 	"github.com/shynur/chaindb/discovery"
 	"github.com/shynur/chaindb/validator/block_cdn"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 var blockCacheDetached sync.Map
@@ -36,7 +36,11 @@ func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
 					host,
 					strconv.Itoa(chaindb_config.TCPPortBlockPCDN),
 				),
-				grpc.WithTransportCredentials(insecure.NewCredentials()),
+				grpc.WithInitialConnWindowSize(math.MaxInt32),
+				grpc.WithInitialWindowSize(math.MaxInt32),
+				grpc.WithMaxHeaderListSize(math.MaxUint32),
+				grpc.WithStaticConnWindowSize(math.MaxInt32),
+				grpc.WithStaticStreamWindowSize(math.MaxInt32),
 			)
 			if err != nil {
 				return
