@@ -272,7 +272,11 @@ func StartUserService() {
 			}
 			var tx_to_insert blockchain.Transaction
 			if err := json.Unmarshal(body, &tx_to_insert); err != nil {
-				http.Error(w, "Tx JSON 反序列化失败", http.StatusBadRequest)
+				http.Error(
+					w,
+					fmt.Sprintf("Tx JSON (%+v) 反序列化失败: %v", string(body), err),
+					http.StatusBadRequest,
+				)
 				return
 			}
 

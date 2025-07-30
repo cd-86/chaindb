@@ -32,7 +32,6 @@ Content-Type: application/json
 }
 
 
-
 # Local Variables:
 # eval: (require 'restclient)  ; <https://melpa.org/#/restclient>
 # mode: restclient
