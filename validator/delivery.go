@@ -3,7 +3,6 @@ package validator
 import (
 	"context"
 	"log"
-	"math"
 	"net"
 	"strconv"
 
@@ -31,13 +30,13 @@ func StartBlockDeliveryServer() {
 	log.Printf("[  PCDN ] 区块 PCDN 服务器开始监听端口: %d", chaindb_config.TCPPortBlockPCDN)
 
 	server := grpc.NewServer(
-		// 放开 gRPC 的所有限制:
-		// grpc.InitialConnWindowSize(math.MaxInt32),
-		// grpc.InitialWindowSize(math.MaxInt32),
-		grpc.MaxHeaderListSize(math.MaxUint32),
-		grpc.MaxRecvMsgSize(math.MaxInt32),
-		// grpc.StaticConnWindowSize(math.MaxInt32),
-		// grpc.StaticStreamWindowSize(math.MaxInt32),
+	// 放开 gRPC 的所有限制:
+	// grpc.InitialConnWindowSize(math.MaxInt32),
+	// grpc.InitialWindowSize(math.MaxInt32),
+	// grpc.MaxHeaderListSize(math.MaxUint32),
+	// grpc.MaxRecvMsgSize(math.MaxInt32),
+	// grpc.StaticConnWindowSize(math.MaxInt32),
+	// grpc.StaticStreamWindowSize(math.MaxInt32),
 	)
 	block_cdn.RegisterBlockDeliveryServer(
 		server,
