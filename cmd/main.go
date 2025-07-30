@@ -1,6 +1,10 @@
 package main
 
 import (
+	"log"
+	"runtime"
+	"time"
+
 	"github.com/shynur/chaindb/blockchain"
 	"github.com/shynur/chaindb/chaindb_config"
 	"github.com/shynur/chaindb/discovery"
@@ -15,6 +19,10 @@ func main() {
 	validator.StartTryPickBlocks(LocalChain)
 	blockchain.StartMining(LocalChain, &LocalTxPool, validator.Propose)
 	monitor.Start(LocalChain, &LocalTxPool)
+	StartUserService()
 
-	select {}
+	for ; ; time.Sleep(chaindb_config.BlockTime / 2) {
+		log.Println("[-] 当前 goroutine 的数量", runtime.NumGoroutine())
+	}
+	// select {}
 }

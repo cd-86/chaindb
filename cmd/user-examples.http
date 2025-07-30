@@ -1,0 +1,39 @@
+################# node #################
+
+# 查询节点目前已经发现了哪些其它节点, 以及管理员手动指定的那些节点
+GET http://localhost:56784/api/v1/peers
+
+# 管理员手动添加一个节点, 这是双向操作.
+# 被添加的节点也会收到一个添加本节点的请求.
+POST http://localhost:56784/api/v1/peers
+Content-Type: application/json
+
+"192.168.13.84"
+
+# 管理员手动删除先前手动添加的节点, 这是双向操作
+DELETE http://localhost:56784/api/v1/peers/192.168.13.84
+
+################## tx ##################
+
+# 获取数据库里所有已注册的 owners
+GET http://localhost:56784/api/v1/owners
+
+# 获取指定 owner 向数据库插入的数据
+GET http://localhost:56784/api/v1/transactions?owner=42
+
+# 向区块链网络插入数据.
+# 直到本机包含该条数据的区块后又接了 CONFIRMATION 个区块才返回.
+POST http://localhost:56784/api/v1/transactions?confirmation=6
+Content-Type: application/json
+
+{
+    "OwnerID": 42,
+    "Nonce": 0
+}
+
+
+
+# Local Variables:
+# eval: (require 'restclient)  ; <https://melpa.org/#/restclient>
+# mode: restclient
+# End:
