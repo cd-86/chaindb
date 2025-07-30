@@ -10,7 +10,7 @@ import (
 )
 
 // 区块链最后一个区块的 UUID.
-type Chain atomic.Uint32
+type Chain atomic.Uint64
 
 func (chain *Chain) ListTxsOwnedBy(owner uint32) (
 	txs []struct {
@@ -111,7 +111,7 @@ func (chain *Chain) ListOwners() (
 }
 
 func (chain *Chain) Head() Block {
-	head_uuid := (*atomic.Uint32)(chain).Load()
+	head_uuid := (*atomic.Uint64)(chain).Load()
 	head, _ := BlockCache.Load(head_uuid)
 	return head.(Block)
 }
@@ -131,15 +131,15 @@ func (chain *Chain) Snapshot() []Block {
 }
 
 func New() *Chain {
-	var blk_uuid atomic.Uint32
+	var blk_uuid atomic.Uint64
 	return (*Chain)(&blk_uuid)
 }
 
-func ForkFrom(parent_uuid uint32) Block {
+func ForkFrom(parent_uuid uint64) Block {
 	parent, _ := BlockCache.Load(parent_uuid)
 
 	return Block{
-		UUID:       rand.Uint32(),
+		UUID:       rand.Uint64(),
 		Height:     parent.(Block).Height + 1,
 		ParentUUID: parent_uuid,
 
@@ -167,11 +167,11 @@ func (chain *Chain) AvgBlockTime() time.Duration {
 	return chaindb_config.BlockTime
 }
 
-func (chain *Chain) TrySwitchHead(new_tail_uuid uint32) (switched bool) {
+func (chain *Chain) TrySwitchHead(new_tail_uuid uint64) (switched bool) {
 	new_tail, _ := BlockCache.Load(new_tail_uuid)
 
 	if new_tail.(Block).Height > chain.Head().Height {
-		(*atomic.Uint32)(chain).Store(new_tail_uuid)
+		(*atomic.Uint64)(chain).Store(new_tail_uuid)
 		return true
 	}
 	return false

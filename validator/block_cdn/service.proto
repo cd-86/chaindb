@@ -7,7 +7,7 @@ service BlockDelivery {
 }
 
 message BlockUUID {
-  uint32 UUID = 1;
+  uint64 UUID = 1;
 }
 
 message BlockGob {

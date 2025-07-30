@@ -53,7 +53,7 @@ func StartMining(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
 }
 
 func BuildBlockTryAppend(chain *Chain, tx_pool *TxPool, proposer func(Block)) {
-	blk := ForkFrom((*atomic.Uint32)(chain).Load())
+	blk := ForkFrom((*atomic.Uint64)(chain).Load())
 
 	txin := make(chan Transaction)
 	go tx_pool.PopFunc(

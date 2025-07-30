@@ -26,7 +26,7 @@ func getBlocksUUIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	block, ok := blockchain.BlockCache.Load(uint32(uuid))
+	block, ok := blockchain.BlockCache.Load(uint64(uuid))
 	if !ok {
 		http.NotFound(w, r)
 		return

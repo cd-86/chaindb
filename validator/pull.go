@@ -18,7 +18,7 @@ import (
 
 var blockCacheDetached sync.Map
 
-func pullOneBlock(blk_uuid uint32) (blk blockchain.Block, err error) {
+func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
 	cached_detached_block, exist := blockCacheDetached.Load(blk_uuid)
 	if exist {
 		return cached_detached_block.(blockchain.Block), nil

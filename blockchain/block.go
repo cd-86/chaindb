@@ -15,9 +15,9 @@ type Block struct {
 	Timestamp    float64 `json:"Timestamp"`
 	MinerAddress string  `json:"MinerAddress"`
 
-	UUID       uint32 `json:"UUID"`
+	UUID       uint64 `json:"UUID"`
 	Height     uint32 `json:"Height"`
-	ParentUUID uint32 `json:"ParentUUID"`
+	ParentUUID uint64 `json:"ParentUUID"`
 
 	Transactions []Transaction `json:"Transactions,omitempty"`
 }
@@ -35,7 +35,7 @@ var BlockCache = func() *sync.Map {
 	cache.Store(the_genesis_block.UUID, the_genesis_block)
 
 	return &cache
-}() // UUID:uint32 -> Block
+}() // UUID:uint64 -> Block
 
 func (tail Block) nextNonceOf(owner uint32) uint32 {
 	for blk := tail; blk.Height != 0; blk, _ = blk.Previous() {
