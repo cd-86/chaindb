@@ -35,35 +35,39 @@ func peersHandler(w http.ResponseWriter, r *http.Request) {
 				func(yield func(v struct {
 					Host                   string
 					AdministratorSpecified bool
+					Reachable              bool
 				}) bool) {
 					admin_specified := discovery.AdministratorSpecifiedNodes.List()
-					for _, host := range admin_specified {
-						c := yield(struct {
-							Host                   string
-							AdministratorSpecified bool
-						}{
-							Host:                   host,
-							AdministratorSpecified: true,
-						})
-						if !c {
-							return
-						}
-					}
 
 					for _, peer := range *discovery.ActiveNodes.Load() {
+						node := struct {
+							Host                   string
+							AdministratorSpecified bool
+							Reachable              bool
+						}{Host: peer, Reachable: true}
+
 						if found := slices.Index(admin_specified, peer); found != -1 {
 							admin_specified = slices.Delete(
 								admin_specified,
 								found, found+1,
 							)
-							continue
+							node.AdministratorSpecified = true
 						}
+						c := yield(node)
+						if !c {
+							return
+						}
+					}
+
+					for _, host := range admin_specified {
 						c := yield(struct {
 							Host                   string
 							AdministratorSpecified bool
+							Reachable              bool
 						}{
-							Host:                   peer,
-							AdministratorSpecified: false,
+							Host:                   host,
+							AdministratorSpecified: true,
+							Reachable:              false,
 						})
 						if !c {
 							return
