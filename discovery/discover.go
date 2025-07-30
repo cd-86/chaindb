@@ -33,7 +33,7 @@ func FindAllActive(timeout time.Duration) (hosts []string) {
 			hosts_list_lock.Lock()
 			defer hosts_list_lock.Unlock()
 			hosts_ = append(hosts_, admin_specified)
-			log.Printf("[Monitor] 用户指定节点 <%s> 是 ping 通的\n", admin_specified)
+			log.Printf("[Monitor] 用户指定节点 <%s> 是可 ping 通的\n", admin_specified)
 		}()
 	}
 
