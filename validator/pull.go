@@ -3,6 +3,7 @@ package validator
 import (
 	"context"
 	"log"
+	"math"
 	"net"
 	"strconv"
 	"sync"
@@ -40,7 +41,7 @@ func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
 				// 放开 gRPC 的所有限制:
 				// rpc.WithInitialConnWindowSize(math.MaxInt32),
 				// grpc.WithInitialWindowSize(math.MaxInt32),
-				// grpc.WithMaxHeaderListSize(math.MaxUint32),
+				grpc.WithMaxHeaderListSize(math.MaxUint32),
 				// grpc.WithStaticConnWindowSize(math.MaxInt32),
 				// grpc.WithStaticStreamWindowSize(math.MaxInt32),
 			)
