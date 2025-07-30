@@ -14,7 +14,7 @@ namespace ::shynur::chaindb {
         const std::uint16_t server_port;
 
         UserClient(
-            const std::string server_host, const std::uint16_t server_port,
+            const std::string server_host, const std::uint16_t server_port
         ): server_host{server_host}, server_port{server_port} {}
 
         auto ListOwners() const {
