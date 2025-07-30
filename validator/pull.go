@@ -36,11 +36,12 @@ func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
 					host,
 					strconv.Itoa(chaindb_config.TCPPortBlockPCDN),
 				),
-				grpc.WithInitialConnWindowSize(math.MaxInt32),
-				grpc.WithInitialWindowSize(math.MaxInt32),
+				// 放开 gRPC 的所有限制:
+				// rpc.WithInitialConnWindowSize(math.MaxInt32),
+				// grpc.WithInitialWindowSize(math.MaxInt32),
 				grpc.WithMaxHeaderListSize(math.MaxUint32),
-				grpc.WithStaticConnWindowSize(math.MaxInt32),
-				grpc.WithStaticStreamWindowSize(math.MaxInt32),
+				// grpc.WithStaticConnWindowSize(math.MaxInt32),
+				// grpc.WithStaticStreamWindowSize(math.MaxInt32),
 			)
 			if err != nil {
 				return
