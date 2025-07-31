@@ -3,9 +3,10 @@
 using namespace std::literals;
 
 namespace ::shynur::chaindb {
+
     struct [[gnu::weak]] Transaction {
-        const std::uint32_t OwnerID;
-        const std::uint32_t Nonce;
+        const std::int32_t OwnerID;
+        const unsigned Nonce;
         const std::string Data;
     };
 
@@ -19,8 +20,8 @@ namespace ::shynur::chaindb {
 
         auto ListOwners() const {
             struct Owner {
-                const std::uint32_t OwnerID;
-				const std::uint32_t ConfirmationScore;
+                const std::int32_t OwnerID;
+				const unsigned ConfirmationScore;
             };
             auto owners = std::vector<owner>{};
 
@@ -31,7 +32,7 @@ namespace ::shynur::chaindb {
         auto ListTransactionsOwnedBy(const std::uint32_t owner) const {
             struct TxWithConfirmation {
                 const Transaction Tx;
-                const std::uint32_t ConfirmationScore;
+                const unsigned ConfirmationScore;
             };
             auto txs = std::vector<TxWithConfirmation>{};
 
