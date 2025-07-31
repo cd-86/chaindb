@@ -109,7 +109,7 @@ namespace shynur::chaindb {
          * @details 根据区块链理论,
          *              p^ConfirmationScore 与 数据可能被篡改的概率
          *          成正比, 其中 p 取值 [0, 1).
-         *          新插入的 Transaction 大约每 1s 增加一个 ConfirmationScore.
+         *          新插入的 transaction 大约每 1.x seconds 增加一个 ConfirmationScore.
          */
         auto ListTransactionsOwnedBy(
             const std::uint32_t owner,
@@ -143,7 +143,7 @@ namespace shynur::chaindb {
          * @details 根据区块链理论,
          *              p^ConfirmationScore 与 数据可能被篡改的概率
          *          成正比, 其中 p 取值 [0, 1).
-         *          新插入的 Transaction 大约每 1s 增加一个 ConfirmationScore.
+         *          新插入的 transaction 大约每 1.x seconds 增加一个 ConfirmationScore.
          * @note 如果因 CAS 操作失败导致插入失败 (see blockchain::Transaction::Nonce),
          *       返回 false.
          *       如果插入成功, 返回 true.
