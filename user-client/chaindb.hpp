@@ -116,7 +116,7 @@ namespace shynur::chaindb {
             const unsigned required_confirmation_score = 0
         ) const {
             struct Tx {
-                const blockchain::Transaction Tx;
+                const blockchain::Transaction Transaction;
                 const unsigned ConfirmationScore;
             };
             auto txs = std::vector<Tx>{};
