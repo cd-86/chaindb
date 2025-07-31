@@ -120,7 +120,7 @@ func StartUserService() {
 			return "", err
 		}
 		defer conn.Close()
-		return conn.LocalAddr().(*net.UDPAddr).String(), nil
+		return conn.LocalAddr().(*net.UDPAddr).IP.String(), nil
 	}
 
 	server.HandleFunc("/api/v1/peers", func(w http.ResponseWriter, r *http.Request) {
@@ -162,13 +162,7 @@ func StartUserService() {
 				return
 			}
 
-			this_host, err := func() ([]byte, error) {
-				ip, err := get_network_ip(peer)
-				if err != nil {
-					return nil, err
-				}
-				return json.Marshal(ip)
-			}()
+			this_ip, err := get_network_ip(peer)
 			if err != nil {
 				http.Error(w, "获取服务器自身 IP 失败", http.StatusInternalServerError)
 				return
@@ -182,11 +176,19 @@ func StartUserService() {
 					),
 				),
 				"application/json",
-				bytes.NewReader(this_host),
+				bytes.NewReader(func() []byte {
+					ip_json, _ := json.Marshal([]string{this_ip})
+					return ip_json
+				}()),
 			)
 			if err != nil {
 				http.Error(w, "添加 Peer 失败", http.StatusBadGateway)
 				return
+			} else {
+				log.Printf(
+					"[  User ] 向 [Peer](%s) 添加 [本节点](%s)\n",
+					peer, this_ip,
+				)
 			}
 
 			http.Post(
@@ -195,7 +197,10 @@ func StartUserService() {
 					chaindb_config.TCPPortMonitor,
 				),
 				"application/json",
-				bytes.NewReader(body),
+				bytes.NewReader(func() []byte {
+					ip_json, _ := json.Marshal([]string{peer})
+					return ip_json
+				}()),
 			)
 
 			w.WriteHeader(http.StatusCreated)
@@ -205,13 +210,7 @@ func StartUserService() {
 
 			peer := strings.Split(r.URL.Path, "/")[4]
 
-			this_host, err := func() ([]byte, error) {
-				ip, err := get_network_ip(peer)
-				if err != nil {
-					return nil, err
-				}
-				return json.Marshal(ip)
-			}()
+			this_ip, err := get_network_ip(peer)
 			if err != nil {
 				http.Error(w, "获取服务器自身 IP 失败", http.StatusInternalServerError)
 				return
@@ -225,7 +224,7 @@ func StartUserService() {
 						peer,
 						strconv.Itoa(chaindb_config.TCPPortMonitor),
 					),
-					this_host,
+					this_ip,
 				),
 				nil,
 			)
@@ -361,7 +360,7 @@ func StartUserService() {
 				} else {
 					http.Error(w, "Tx 已经存在", http.StatusConflict)
 				}
-			case <-time.After(time.Duration(3 * confirmation * int(chaindb_config.BlockTime))):
+			case <-time.After(time.Duration(3 * (confirmation + 1) * int(chaindb_config.BlockTime))):
 				http.Error(w, "超时", http.StatusServiceUnavailable)
 			}
 			stop <- nil
