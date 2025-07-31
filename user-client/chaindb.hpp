@@ -27,7 +27,7 @@ namespace shynur::chaindb {
              *          多个 client 可能同时发起对 Data 的修订请求.  为了保证
              *          操作的原子性, Nonce 被 ChainDB 视为原子变量, Data 的插入
              *          成功与否与 Nonce 绑定.  借鉴自 Ethereum (以太坊).
-             *          Nonce 采用 Compare-And-Swap 方式进行更新 (以下操作是原子的):
+             *          Nonce 采用 Compare-And-Swap 方式进行更新 (下列操作作为一个整体是原子的):
              *              - ChainDB 找出相同 OwnerID 的数据条目的修订历史记录
              *              - 发现最后一次修订号是 LastNonce
              *              - 如果 Nonce==LastNonce+1, 则插入成功, 且最后一次修订号被更新为了 Nonce
