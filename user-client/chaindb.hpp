@@ -77,7 +77,7 @@ namespace shynur::chaindb {
          * @details 根据区块链理论,
          *              p^ConfirmationScore 与 数据可能被篡改的概率
          *          成正比, 其中 p 取值 [0, 1).
-         *          新插入的 transaction 大约每 1s 增加一个 ConfirmationScore.
+         *          新插入的 transaction 大约每 1.x seconds 增加一个 ConfirmationScore.
          * @see blockchain::Transaction
          */
         auto ListOwners(const unsigned required_confirmation_score = 0) const {
