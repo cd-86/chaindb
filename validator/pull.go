@@ -70,12 +70,15 @@ func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
 	}
 
 	err = blk.FromGob(<-block_request)
+	if blk, cached := blockchain.BlockCache.Load(blk_uuid); cached {
+		return blk.(blockchain.Block), nil
+	}
 	if err != nil {
 		log.Printf("[  Pull ] 拉取区块失败, UUID=%d, 错误: %v\n", blk_uuid, err)
 		return blockchain.Block{}, err
 	}
-	if _, no_store := blockCacheDetached.LoadOrStore(blk_uuid, blk); !no_store {
-		blockCacheDetached.Store(blk_uuid, blk)
+	_, no_store := blockCacheDetached.LoadOrStore(blk_uuid, blk)
+	if !no_store {
 		log.Printf(
 			"[  Pull ] 拉取到区块 Block.UUID=%d, Block.Height=%d\n",
 			blk.UUID,
