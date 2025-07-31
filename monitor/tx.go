@@ -43,7 +43,10 @@ func getOwnersHandler(w http.ResponseWriter, _ *http.Request) {
 
 // GET /owners/{owner_id}/transactions
 func getOwnersOwnerIDTransactionsHandler(w http.ResponseWriter, r *http.Request) {
-	owner, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[2])
+	owner, err := strconv.ParseUint(
+		strings.Split(r.URL.Path, "/")[2],
+		10, 32,
+	)
 	if err != nil {
 		http.NotFound(w, r)
 		return
