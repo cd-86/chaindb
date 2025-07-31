@@ -45,7 +45,7 @@ namespace shynur::chaindb {
     }
 
     /**
-     * @brief 向固定 ChainDB 服务器发送请求的客户端.
+     * @brief 向固定的 ChainDB 服务器发送请求的客户端.
      * @note 除非以 '_async' 作为方法后缀, 否则所有方法都是阻塞的.
      *       服务器正在同步数据时, 会阻塞较久.
      */
