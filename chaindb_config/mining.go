@@ -22,5 +22,5 @@ var MinerAddress = func() string {
 	if err != nil {
 		panic(err)
 	}
-	return short_hostname + "-" + strconv.Itoa(rand.Int()%63336)
+	return short_hostname + "-" + strconv.Itoa(rand.Int()%1024)
 }()
