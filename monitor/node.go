@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"slices"
 	"strings"
@@ -12,11 +13,10 @@ import (
 func registerNodeService(server *http.ServeMux) {
 	server.HandleFunc("/peers", peersHandler)
 	server.HandleFunc("/peers/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodDelete {
-			deletePeersHostHandler(w, r)
-		} else {
+		if r.Method != http.MethodDelete {
 			http.NotFound(w, r)
 		}
+		deletePeersHostHandler(w, r)
 	})
 }
 
@@ -24,6 +24,7 @@ func registerNodeService(server *http.ServeMux) {
 func deletePeersHostHandler(w http.ResponseWriter, r *http.Request) {
 	host := strings.Split(r.URL.Path, "/")[2]
 	discovery.AdministratorSpecifiedNodes.Remove([]string{host})
+	log.Printf("[Monitor] 删除 Peer: %s\n", host)
 	w.WriteHeader(http.StatusNoContent)
 }
 

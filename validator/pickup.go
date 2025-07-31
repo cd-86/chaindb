@@ -22,12 +22,14 @@ func StartTryPickBlocks(chain *blockchain.Chain) {
 	}
 
 	go func() {
+		max_blk_bufsize := 4096
 		for {
-			blk_obj := make([]byte, 65536)
+			blk_obj := make([]byte, max_blk_bufsize)
 			n, _, _ := conn.ReadFrom(blk_obj)
 
 			if n >= len(blk_obj) {
 				log.Printf("[  Pull ] 接收到的区块数据过大, 被丢弃!\n")
+				max_blk_bufsize *= 2
 				continue
 			} else {
 				log.Printf("[  Pull ] 接收到其它矿工开采的区块: size=%dB\n", n)

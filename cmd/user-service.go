@@ -123,10 +123,58 @@ func StartUserService() {
 		return conn.LocalAddr().(*net.UDPAddr).IP.String(), nil
 	}
 
-	server.HandleFunc("/api/v1/peers", func(w http.ResponseWriter, r *http.Request) {
-		wait_for_sync.RLock()
-		defer wait_for_sync.RUnlock()
+	// `DELETE /api/v1/peers/[host]`
+	// ==> 状态码
+	server.HandleFunc("/api/v1/peers/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			http.Error(w, "只支持 DELETE", http.StatusMethodNotAllowed)
+			return
+		}
 
+		peer := strings.Split(r.URL.Path, "/")[4]
+
+		this_ip, err := get_network_ip(peer)
+		if err != nil {
+			http.Error(w, "获取服务器自身 IP 失败", http.StatusInternalServerError)
+			return
+		}
+
+		_, err = http.NewRequest(
+			http.MethodDelete,
+			fmt.Sprintf(
+				"http://%s/peers/%s",
+				net.JoinHostPort(
+					peer,
+					strconv.Itoa(chaindb_config.TCPPortMonitor),
+				),
+				this_ip,
+			),
+			nil,
+		)
+		if err != nil {
+			http.Error(w, "删除 Peer 失败", http.StatusBadGateway)
+			return
+		} else {
+			log.Printf(
+				"[  User ] 向 [Peer](%s) 删除 [本节点](%s)\n",
+				peer, this_ip,
+			)
+		}
+
+		http.NewRequest(
+			http.MethodDelete,
+			fmt.Sprintf(
+				"http://localhost:%d/peers/%s",
+				chaindb_config.TCPPortMonitor,
+				peer,
+			),
+			nil,
+		)
+
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	server.HandleFunc("/api/v1/peers", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			// `GET /api/v1/peers`
@@ -204,46 +252,6 @@ func StartUserService() {
 			)
 
 			w.WriteHeader(http.StatusCreated)
-		case http.MethodDelete:
-			// `DELETE /api/v1/peers/[host]`
-			// ==> 状态码
-
-			peer := strings.Split(r.URL.Path, "/")[4]
-
-			this_ip, err := get_network_ip(peer)
-			if err != nil {
-				http.Error(w, "获取服务器自身 IP 失败", http.StatusInternalServerError)
-				return
-			}
-
-			_, err = http.NewRequest(
-				http.MethodDelete,
-				fmt.Sprintf(
-					"http://%s/peers/%s",
-					net.JoinHostPort(
-						peer,
-						strconv.Itoa(chaindb_config.TCPPortMonitor),
-					),
-					this_ip,
-				),
-				nil,
-			)
-			if err != nil {
-				http.Error(w, "删除 Peer 失败", http.StatusBadGateway)
-				return
-			}
-
-			http.NewRequest(
-				http.MethodDelete,
-				fmt.Sprintf(
-					"http://localhost:%d/peers/%s",
-					chaindb_config.TCPPortMonitor,
-					peer,
-				),
-				nil,
-			)
-
-			w.WriteHeader(http.StatusNoContent)
 		default:
 			http.Error(w, "不支持的 HTTP verb", http.StatusMethodNotAllowed)
 		}
@@ -281,7 +289,7 @@ func StartUserService() {
 
 			stop := make(chan any, 1)
 			go func() {
-				for ; ; time.Sleep(chaindb_config.BlockTime) {
+				for ; ; time.Sleep(chaindb_config.BlockTime / 2) {
 					select {
 					default:
 					case <-stop:
@@ -431,6 +439,6 @@ func StartUserService() {
 			),
 			server,
 		)
-		log.Fatalln("[UserService] Error:", err)
+		log.Fatalln("[  User ] Error:", err)
 	}()
 }
