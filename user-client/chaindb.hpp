@@ -14,10 +14,10 @@ namespace shynur::chaindb {
          */
         struct [[gnu::weak]] Transaction {
             /**
-            * @brief 数据条目在 ChainDB 中的索引号.
-            * @details 因为一个索引号对应的数据条目可能有很多个修订历史,
-            *          即一对多的关系, 所以称索引为 owner.
-            */
+             * @brief 数据条目在 ChainDB 中的索引号.
+             * @details 因为一个索引号对应的数据条目可能有很多个修订历史,
+             *          即一对多的关系, 所以称索引为 owner.
+             */
             const std::uint32_t OwnerID;
 
             /**
