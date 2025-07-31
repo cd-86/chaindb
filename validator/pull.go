@@ -74,7 +74,7 @@ func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
 		log.Printf("[  Pull ] 拉取区块失败, UUID=%d, 错误: %v\n", blk_uuid, err)
 		return blockchain.Block{}, err
 	}
-	if _, exist := blockCacheDetached.Load(blk_uuid); !exist {
+	if _, no_store := blockCacheDetached.LoadOrStore(blk_uuid, blk); !no_store {
 		blockCacheDetached.Store(blk_uuid, blk)
 		log.Printf(
 			"[  Pull ] 拉取到区块 Block.UUID=%d, Block.Height=%d\n",
