@@ -3,6 +3,7 @@ package validator
 import (
 	"log"
 	"net"
+	"os"
 	"strconv"
 
 	"github.com/shynur/chaindb/blockchain"
@@ -22,7 +23,7 @@ func StartTryPickBlocks(chain *blockchain.Chain) {
 	}
 
 	go func() {
-		max_blk_bufsize := 4096
+		max_blk_bufsize := os.Getpagesize()
 		for {
 			blk_obj := make([]byte, max_blk_bufsize)
 			n, _, _ := conn.ReadFrom(blk_obj)
