@@ -152,11 +152,14 @@ func StartUserService() {
 			nil,
 		)
 		if err != nil {
-			http.Error(w, "删除 Peer 失败", http.StatusBadGateway)
-			return
+			log.Printf(
+				"[  User ] [Peer](%s) 删除 [本节点](%s): %v\n",
+				peer, this_ip,
+				err,
+			)
 		} else {
 			log.Printf(
-				"[  User ] 向 [Peer](%s) 删除 [本节点](%s)\n",
+				"[  User ] 让 [Peer](%s) 删除 [本节点](%s)\n",
 				peer, this_ip,
 			)
 		}
