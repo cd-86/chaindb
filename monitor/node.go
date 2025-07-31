@@ -13,7 +13,7 @@ import (
 func registerNodeService(server *http.ServeMux) {
 	server.HandleFunc("/peers", peersHandler)
 	server.HandleFunc("/peers/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
+		if r.Method != "DELETE" {
 			http.NotFound(w, r)
 		}
 		deletePeersHostHandler(w, r)
@@ -91,9 +91,9 @@ func peersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch r.Method {
-	case http.MethodGet:
+	case "GET":
 		get()
-	case http.MethodPost:
+	case "POST":
 		post()
 	default:
 		http.NotFound(w, r)

@@ -12,7 +12,7 @@ import (
 
 func registerTxService(server *http.ServeMux) {
 	server.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
+		if r.Method == "POST" {
 			postTransactionsHandler(w, r)
 		} else {
 			http.NotFound(w, r)

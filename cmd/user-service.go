@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
@@ -126,7 +127,7 @@ func StartUserService() {
 	// `DELETE /api/v1/peers/[host]`
 	// ==> 状态码
 	server.HandleFunc("/api/v1/peers/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
+		if r.Method != "DELETE" {
 			http.Error(w, "只支持 DELETE", http.StatusMethodNotAllowed)
 			return
 		}
@@ -139,21 +140,27 @@ func StartUserService() {
 			return
 		}
 
-		_, err = http.NewRequest(
-			http.MethodDelete,
-			fmt.Sprintf(
-				"http://%s/peers/%s",
-				net.JoinHostPort(
-					peer,
-					strconv.Itoa(chaindb_config.TCPPortMonitor),
-				),
-				this_ip,
-			),
-			nil,
+		_, err = http.DefaultClient.Do(
+			&http.Request{
+				Method: "DELETE",
+				URL: func() *url.URL {
+					parsed, _ := url.Parse(
+						fmt.Sprintf(
+							"http://%s/peers/%s",
+							net.JoinHostPort(
+								peer,
+								strconv.Itoa(chaindb_config.TCPPortMonitor),
+							),
+							this_ip,
+						),
+					)
+					return parsed
+				}(),
+			},
 		)
 		if err != nil {
 			log.Printf(
-				"[  User ] [Peer](%s) 删除 [本节点](%s): %v\n",
+				"[  User ] 让 [Peer](%s) 删除 [本节点](%s) 失败: %v\n",
 				peer, this_ip,
 				err,
 			)
@@ -164,14 +171,20 @@ func StartUserService() {
 			)
 		}
 
-		http.NewRequest(
-			http.MethodDelete,
-			fmt.Sprintf(
-				"http://localhost:%d/peers/%s",
-				chaindb_config.TCPPortMonitor,
-				peer,
-			),
-			nil,
+		http.DefaultClient.Do(
+			&http.Request{
+				Method: "DELETE",
+				URL: func() *url.URL {
+					parsed, _ := url.Parse(
+						fmt.Sprintf(
+							"http://localhost:%d/peers/%s",
+							chaindb_config.TCPPortMonitor,
+							peer,
+						),
+					)
+					return parsed
+				}(),
+			},
 		)
 
 		w.WriteHeader(http.StatusNoContent)
@@ -179,7 +192,7 @@ func StartUserService() {
 
 	server.HandleFunc("/api/v1/peers", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case http.MethodGet:
+		case "GET":
 			// `GET /api/v1/peers`
 			// ==> JSON
 
@@ -198,7 +211,7 @@ func StartUserService() {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(resp.StatusCode)
 			io.Copy(w, resp.Body)
-		case http.MethodPost:
+		case "POST":
 			// `POST /api/v1/peers` + JSON
 			// ==> 状态码
 
@@ -265,7 +278,7 @@ func StartUserService() {
 		defer wait_for_sync.RUnlock()
 
 		switch r.Method {
-		case http.MethodPost:
+		case "POST":
 			// `POST /api/v1/transactions?confirmation=6` + JSON
 			// ==> 状态码
 
@@ -375,7 +388,7 @@ func StartUserService() {
 				http.Error(w, "超时", http.StatusServiceUnavailable)
 			}
 			stop <- nil
-		case http.MethodGet:
+		case "GET":
 			// `GET /api/v1/transactions?owner=42`
 			// ==> JSON
 
@@ -412,7 +425,7 @@ func StartUserService() {
 		wait_for_sync.RLock()
 		defer wait_for_sync.RUnlock()
 
-		if r.Method != http.MethodGet {
+		if r.Method != "GET" {
 			http.Error(w, "只支持 GET", http.StatusMethodNotAllowed)
 			return
 		}
