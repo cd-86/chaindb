@@ -10,7 +10,7 @@ namespace shynur::chaindb {
 
     namespace blockchain {
         /**
-        * @brief ChainDB 存储的基本元素.  表示一次修订历史.
+        * @brief ChainDB 存储的基本元素.  代表一次修订历史.
         */
         struct [[gnu::weak]] Transaction {
             /**
