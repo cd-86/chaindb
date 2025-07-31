@@ -49,7 +49,7 @@ func getOwnersOwnerIDTransactionsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	log.Printf("[Monitor] 正在请求交易记录 owned by %d\n", owner)
+	log.Printf("[Monitor] 被请求添加的交易记录 OwnerID=%d\n", owner)
 	json.NewEncoder(w).Encode(
 		theChain.ListTxsOwnedBy(uint32(owner)),
 	)

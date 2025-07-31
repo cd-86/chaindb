@@ -361,7 +361,7 @@ func StartUserService() {
 				} else {
 					http.Error(w, "Tx 已经存在", http.StatusConflict)
 				}
-			case <-time.After(time.Duration(2 * confirmation * int(chaindb_config.BlockTime))):
+			case <-time.After(time.Duration(3 * confirmation * int(chaindb_config.BlockTime))):
 				http.Error(w, "超时", http.StatusServiceUnavailable)
 			}
 			stop <- nil
