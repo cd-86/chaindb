@@ -138,7 +138,7 @@ namespace shynur::chaindb {
         /**
          * @brief 向 ChainDB 插入一条 transaction.
          * @param required_confirmation_score
-         *        等待, 直到 ChainDB 中的被插入的这条 transaction
+         *        等待, 直到被插入的这条 transaction 在 ChainDB 中
          *        的 ConfirmationScore 达到该值.  通常设为 10 即可.
          * @details 根据区块链理论,
          *              p^ConfirmationScore 与 数据可能被篡改的概率
