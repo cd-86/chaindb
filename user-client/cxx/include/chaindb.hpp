@@ -65,7 +65,7 @@ namespace shynur::chaindb {
         ): origin{origin} {
             if (this->origin.find("http://localhost:") == 0) {
                 std::system(
-                    R"(bash -c "cd ../..; make; ./chaindb.exe &>/dev/null &")"
+                    R"(bash -c "cd ../..; make chaindb.exe; ./chaindb.exe &>/dev/null &")"
                 );
                 std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
             }
