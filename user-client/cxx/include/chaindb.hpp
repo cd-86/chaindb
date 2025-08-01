@@ -62,7 +62,7 @@ namespace shynur::chaindb {
         UserClient(
             const std::string origin
                 = "http://localhost:" + std::to_string(chaindb_config::TCPPortUserService)
-        ): origin{origin} {
+        ) noexcept: origin{origin} {
             if (this->origin.find("http://localhost:") == 0) {
                 std::system(
                     R"(bash -c "cd ../..; make chaindb.exe; ./chaindb.exe &>/dev/null &")"
