@@ -48,11 +48,11 @@ namespace shynur::chaindb {
 
     /**
      * @brief 向固定的 ChainDB 服务器发送请求的客户端.
-     * @note 除非以 '_async' 作为方法后缀, 否则所有方法都是阻塞的.
+     * @note 所有方法都是阻塞的.
      *       服务器正在同步数据时, 会阻塞较久.
      */
     struct [[gnu::weak]] UserClient {
-        const std::string website;
+        const std::string origin;
         httplib::Client client;
 
         /**
@@ -61,10 +61,10 @@ namespace shynur::chaindb {
          *       完成.  如果数据未同步, 后续的请求会继续阻塞, 无需关心.
          */
         UserClient(
-            const std::string website
+            const std::string origin
                 = "http://localhost:" + std::to_string(chaindb_config::TCPPortUserService)
-        ): website{website}, client{this->website} {
-            if (this->website.starts_with("http://localhost:")) {
+        ): origin{origin}, client{this->origin} {
+            if (this->origin.starts_with("http://localhost:")) {
                 // std::system("chaindb.x64-linux.exe &>/dev/null &");
                 // std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
             }
@@ -83,21 +83,24 @@ namespace shynur::chaindb {
          * @see blockchain::Transaction
          */
         auto ListOwners(const unsigned required_confirmation_score = 0) const {
-            const auto resp = this->client.Get("/api/v1/owners");
-            if (res && res->status == 200) {
-        std::cout << "响应状态码: " << res->status << std::endl;
-        std::cout << "响应体(JSON): " << res->body << std::endl;
-    } else {
-        std::cerr << "请求失败" << std::endl;
-        if (res) {
-            std::cerr << "HTTP 状态码: " << res->status << std::endl;
-        }
-    }
-            const auto owners_json = R"([{"OwnerID":42,"ConfirmationScore":74780},{"OwnerID":421,"ConfirmationScore":74361}])";
+            const auto owners_json = [this] {
+                const auto resp = this->client.Get("/api/v1/owners");
+
+                if (!resp)
+                    throw std::runtime_error{"[shynur/chaindb] HTTP failed"};
+
+                if (resp->status / 100 != 2)
+                    throw std::runtime_error{
+                        "[shynur/chaindb] HTTP status=" + std::to_string(resp->status) + ' '
+                        + "error: " + resp->reason
+                    };
+
+                return resp->body;
+            }();
 
             struct Owner {
                 const std::uint32_t OwnerID;
-				const unsigned ConfirmationScore;
+                const unsigned ConfirmationScore;
             };
             auto owners = std::vector<Owner>{};
             for (const auto& owner : ::nlohmann::json::parse(owners_json)) {
@@ -134,7 +137,22 @@ namespace shynur::chaindb {
             const std::uint32_t owner,
             const unsigned required_confirmation_score = 0
         ) const {
-            const auto txs_json = R"([{"Tx":{"OwnerID":421,"Nonce":0},"ConfirmationScore":75111}])";
+            const auto txs_json = [&, this] {
+                const auto resp = this->client.Get(
+                    "/api/v1/transactions?owner=" + std::to_string(owner)
+                );
+
+                if (!resp)
+                    throw std::runtime_error{"[shynur/chaindb] HTTP failed"};
+
+                if (resp->status / 100 != 2)
+                    throw std::runtime_error{
+                        "[shynur/chaindb] HTTP status=" + std::to_string(resp->status) + ' '
+                        + "error: " + resp->reason
+                    };
+
+                return resp->body;
+            }();
 
             struct Tx {
                 const blockchain::Transaction Transaction;
@@ -185,22 +203,24 @@ namespace shynur::chaindb {
          *       如果插入成功, 返回 true.
          *       如果不清楚结果如何, 但是超时了, 也会返回 false, 你可以重试.
          */
-        auto Insert_async(
+        auto Insert(
             const blockchain::Transaction transaction,
             const std::uint32_t required_confirmation_score
-        ) const -> std::future<bool> {
-            const auto tx_obj = ::nlohmann::json{
+        ) const {
+            const auto tx_json = ::nlohmann::json{
                 {"OwnerID", transaction.OwnerID},
                 {"Nonce", transaction.Nonce},
                 {"Data", transaction.Data},
-            };
+            }.dump(4);
 
-            return std::async(
-                [](){
-                    // TODO
-                    return true;
-                }
+            const auto resp = this->client.Post(
+                "/api/v1/transactions?confirmation=" + std::to_string(required_confirmation_score),
+                tx_json,
+                "application/json"
             );
+            if (!resp)
+                throw std::runtime_error{"[shynur/chaindb] HTTP failed"};
+            return resp->status / 100 != 2;
         }
     };
 }

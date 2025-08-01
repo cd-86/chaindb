@@ -5,15 +5,61 @@ namespace chaindb = rbk::chaindb;
 int main() {
     const auto uc = chaindb::UserClient{};
 
-    for (const auto& [owner, confirmation] : uc.ListOwners()) {
-        std::cout << "OwnerID: " << owner << '\t'
-                  << "ConfirmationScore: " << confirmation << '\n';
-    }
+    for (char op; std::cin >> op; std::cout << std::endl) {
+        try {
+            switch (op) {
+                case 'o': {
+                    std::cout << "Confirmation Score >= ";
+                    unsigned confirmation;
+                    std::cin >> confirmation;
 
-    for (const auto& [transaction, confirmation] : uc.ListTransactionsOwnedBy(421)) {
-        std::cout << "OwnerID: " << transaction.OwnerID << '\t'
-                  << "Nonce: " << transaction.Nonce << '\t'
-                  << "Data: " << transaction.Data << '\t'
-                  << "ConfirmationScore: " << confirmation << '\n';
+                    for (const auto& [owner, confirmation] : uc.ListOwners(confirmation))
+                        std::cout << "OwnerID: " << owner << '\t'
+                                  << "ConfirmationScore: " << confirmation << '\n';
+                }
+                    break;
+                case 't': {
+                    std::cout << "OwnerID=";
+                    unsigned owner;
+                    std::cin >> owner;
+
+                    std::cout << "Confirmation Score >= ";
+                    unsigned confirmation;
+                    std::cin >> confirmation;
+
+                    for (const auto& [transaction, confirmation] : uc.ListTransactionsOwnedBy(owner, confirmation)) {
+                        std::cout << "OwnerID: " << transaction.OwnerID << '\t'
+                                  << "Nonce: " << transaction.Nonce << '\t'
+                                  << "ConfirmationScore: " << confirmation;
+                        if (!transaction.Data.empty())
+                            std::cout << '\t' << "Data: " << transaction.Data;
+                        else
+                            std::cout << '\n';
+                    }
+                }
+                    break;
+                case 'i': {
+                    std::cout << "OwnerID=";
+                    std::uint32_t owner_id;
+                    std::cin >> owner_id;
+
+                    std::cout << "Nonce=";
+                    unsigned nonce;
+                    std::cin >> nonce;
+
+                    std::cout << "Data=";
+                    std::string data;
+                    std::cin >> data;
+
+                    std::cout << "Confirmation Score >= ";
+                    unsigned confirmation;
+                    std::cin >> confirmation;
+
+                    uc.Insert({owner_id, nonce, data}, confirmation);
+                }
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+        }
     }
 }
