@@ -1,5 +1,6 @@
 #pragma once
 #include <bits/stdc++.h>
+#include "nlohmann/json.hpp"
 using namespace std::literals;
 
 namespace shynur::chaindb {
@@ -50,8 +51,10 @@ namespace shynur::chaindb {
      *       服务器正在同步数据时, 会阻塞较久.
      */
     struct [[gnu::weak]] UserClient {
-        const std::string server_host;
-        const std::uint16_t server_tcp_port;
+        const struct {
+            std::string host;
+            std::uint16_t tcp_port;
+        } server;
 
         /**
          * @note 如果 server_host 是 "localhost", 则会尝试启动一个本地的
@@ -59,10 +62,9 @@ namespace shynur::chaindb {
          *       完成.  如果数据未同步, 后续的请求会继续阻塞, 无需关心.
          */
         UserClient(
-            const std::string server_host = "localhost",
-            const std::uint16_t server_tcp_port = chaindb_config::TCPPortUserService
-        ): server_host{server_host}, server_tcp_port{server_tcp_port} {
-            if (server_host == "localhost") {
+            const decltype(UserClient::server) server = {"localhost", chaindb_config::TCPPortUserService}
+        ): server{server} {
+            if (server.host == "localhost") {
                 std::system("chaindb.x64-linux.exe &");
                 std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
             }
@@ -163,7 +165,7 @@ namespace shynur::chaindb {
     };
 }
 
-#ifdef SEER_ROBOTICS_RBK
+#ifdef SHYNUR_USED_BY_SEER_ROBOTICS_RBK
 namespace rbk::chaindb {
     using UserClient = ::shynur::chaindb::UserClient;
     using Transaction = ::shynur::chaindb::blockchain::Transaction;
