@@ -83,6 +83,16 @@ namespace shynur::chaindb {
          * @see blockchain::Transaction
          */
         auto ListOwners(const unsigned required_confirmation_score = 0) const {
+            const auto resp = this->client.Get("/api/v1/owners");
+            if (res && res->status == 200) {
+        std::cout << "响应状态码: " << res->status << std::endl;
+        std::cout << "响应体(JSON): " << res->body << std::endl;
+    } else {
+        std::cerr << "请求失败" << std::endl;
+        if (res) {
+            std::cerr << "HTTP 状态码: " << res->status << std::endl;
+        }
+    }
             const auto owners_json = R"([{"OwnerID":42,"ConfirmationScore":74780},{"OwnerID":421,"ConfirmationScore":74361}])";
 
             struct Owner {
