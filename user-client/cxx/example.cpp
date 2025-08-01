@@ -80,10 +80,11 @@ int main() {
                     }();
 
                     const auto ok = uc.Insert({owner_id, nonce, data}, confirmation);
+                    std::cout << '\n\t';
                     if (ok)
-                        std::cout << "Insert OK";
+                        std::cout << "OK";
                     else
-                        std::cout << "Insert Failed";
+                        std::cout << "Failed";
                     std::cout << '\n';
                 }
             }
