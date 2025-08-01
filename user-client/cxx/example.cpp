@@ -14,7 +14,7 @@ int main() {
             switch (op) {
                 case 'o': {
                     std::cout << "(默认是 0) Confirmation Score >= ";
-                    const auto confirmation = [] -> unsigned {
+                    const auto confirmation = []() -> unsigned {
                         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                         auto confirmation = std::string{};
                         std::getline(std::cin, confirmation);
@@ -34,7 +34,7 @@ int main() {
                     std::cin >> owner;
 
                     std::cout << "(默认是 0) Confirmation Score >= ";
-                    const auto confirmation = [] -> unsigned {
+                    const auto confirmation = []() -> unsigned {
                         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                         auto confirmation = std::string{};
                         std::getline(std::cin, confirmation);
@@ -63,7 +63,7 @@ int main() {
                     std::cin >> nonce;
 
                     std::cout << "(默认是 0) Confirmation Score >= ";
-                    const auto confirmation = [] -> unsigned {
+                    const auto confirmation = []() -> unsigned {
                         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                         auto confirmation = std::string{};
                         std::getline(std::cin, confirmation);
