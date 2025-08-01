@@ -1,6 +1,8 @@
 SHELL = /bin/bash -O globstar
 CXX ?= c++
-CXXFLAGS :=  -Wpedantic -Wall -W -O0 -g3 -Wno-c++20-extensions $(CXXFLAGS)
+CXXFLAGS :=  -Wpedantic -Wall -W -O0 -g3  \
+			-Wno-c++20-extensions -Wc++23-extensions  \
+			$(CXXFLAGS)
 
 .PHONY: run
 run: | /tmp/shynur/chaindb/user-client/cxx/
