@@ -111,12 +111,12 @@ namespace shynur::chaindb {
                 });
             }
 
-            return [&] {
+            return [&]() noexcept {
                 auto confirmed_owners = std::vector<Owner>{};
                 std::copy_if(
                     std::cbegin(owners), std::cend(owners),
                     std::back_inserter(confirmed_owners),
-                    [&](const auto& owner) {
+                    [&](const auto& owner) noexcept {
                         return owner.ConfirmationScore > required_confirmation_score;
                     }
                 );
@@ -165,7 +165,7 @@ namespace shynur::chaindb {
                     .Transaction = {
                         .OwnerID = tx["Tx"]["OwnerID"],
                         .Nonce = tx["Tx"]["Nonce"],
-                        .Data = [&]() -> std::string {
+                        .Data = [&]() noexcept -> std::string {
                             try {
                                 return tx["Tx"].at("Data");
                             } catch (const ::nlohmann::json::out_of_range&) {
@@ -177,12 +177,12 @@ namespace shynur::chaindb {
                 });
             }
 
-            return [&]() {
+            return [&]() noexcept {
                 auto confirmed_txs = std::vector<Tx>{};
                 std::copy_if(
                     std::cbegin(txs), std::cend(txs),
                     std::back_inserter(confirmed_txs),
-                    [&](const auto& tx) {
+                    [&](const auto& tx) noexcept {
                         return tx.ConfirmationScore > required_confirmation_score;
                     }
                 );
