@@ -19,7 +19,7 @@ int main() {
                         auto confirmation = std::string{};
                         std::getline(std::cin, confirmation);
                         if (confirmation.empty())
-                            return 0ul;
+                            return 0;
                         return std::stoul(confirmation);
                     }();
 
@@ -39,7 +39,7 @@ int main() {
                         auto confirmation = std::string{};
                         std::getline(std::cin, confirmation);
                         if (confirmation.empty())
-                            return 0ul;
+                            return 0;
                         return std::stoul(confirmation);
                     }();
 
