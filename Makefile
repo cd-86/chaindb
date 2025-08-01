@@ -5,7 +5,7 @@ chaindb.exe: \
 		always  \
 		./validator/block_cdn/service.pb.go  \
 		./validator/block_cdn/service_grpc.pb.go
-	go build -o chaindb.exe ./cmd
+	go build -buildvcs=false -o chaindb.exe ./cmd
 
 ./validator/block_cdn/%.pb.go ./validator/block_cdn/%_grpc.pb.go: ./validator/block_cdn/service.proto
 	protoc  \
