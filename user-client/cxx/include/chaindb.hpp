@@ -64,8 +64,8 @@ namespace shynur::chaindb {
                 = "http://localhost:" + std::to_string(chaindb_config::TCPPortUserService)
         ): origin{origin} {
             if (this->origin.find("http://localhost:") == 0) {
-                // std::system("chaindb.x64-linux.exe &>/dev/null &");
-                // std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
+                std::system("chaindb.x64-linux.exe &>/dev/null &");
+                std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
             }
         }
 
