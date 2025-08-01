@@ -8,6 +8,7 @@ CXXFLAGS :=  -Wpedantic -Wall -W -O0 -g3  \
 run: | /tmp/shynur/chaindb/user-client/cxx/
 	$(CXX) $(CXXFLAGS)  \
 		./example.cpp -o /tmp/shynur/chaindb/user-client/cxx/example.exe
+	@echo
 	/tmp/shynur/chaindb/user-client/cxx/example.exe
 
 /tmp/shynur/chaindb/user-client/cxx/:
