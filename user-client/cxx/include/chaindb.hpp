@@ -229,6 +229,5 @@ namespace shynur::chaindb {
 #ifdef SHYNUR_USED_BY_SEER_ROBOTICS_RBK
 namespace rbk::chaindb {
     using UserClient = ::shynur::chaindb::UserClient;
-    using Transaction = ::shynur::chaindb::blockchain::Transaction;
 }
 #endif
