@@ -5,8 +5,9 @@ namespace chaindb = rbk::chaindb;
 int main() {
     const auto uc = chaindb::UserClient{};
 
-    for (char op; std::cin >> op; std::cout << std::endl) {
+    for (char op; std::cin; std::cout << std::endl) {
         std::cout << "Operation (o=列出索引, t=列出数据, i=插入数据): ";
+        std::cin >> op;
         try {
             switch (op) {
                 case 'o': {
