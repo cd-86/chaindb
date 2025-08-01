@@ -64,7 +64,7 @@ namespace shynur::chaindb {
             const std::string website
                 = "http://localhost:" + std::to_string(chaindb_config::TCPPortUserService)
         ): website{website}, client{this->website} {
-            if (website.starts_with("http://localhost:")) {
+            if (this->website.starts_with("http://localhost:")) {
                 // std::system("chaindb.x64-linux.exe &>/dev/null &");
                 // std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
             }
@@ -83,16 +83,14 @@ namespace shynur::chaindb {
          * @see blockchain::Transaction
          */
         auto ListOwners(const unsigned required_confirmation_score = 0) const {
+            const auto owners_json = R"([{"OwnerID":42,"ConfirmationScore":74780},{"OwnerID":421,"ConfirmationScore":74361}])";
+
             struct Owner {
                 const std::uint32_t OwnerID;
 				const unsigned ConfirmationScore;
             };
             auto owners = std::vector<Owner>{};
-
-            const auto owners_json = R"([{"OwnerID":42,"ConfirmationScore":74780},{"OwnerID":421,"ConfirmationScore":74361}])";
-
-            const auto owners_obj = ::nlohmann::json::parse(owners_json);
-            for (const auto& owner : owners_obj) {
+            for (const auto& owner : ::nlohmann::json::parse(owners_json)) {
                 owners.push_back({
                     .OwnerID = owner["OwnerID"],
                     .ConfirmationScore = owner["ConfirmationScore"],
@@ -126,16 +124,14 @@ namespace shynur::chaindb {
             const std::uint32_t owner,
             const unsigned required_confirmation_score = 0
         ) const {
+            const auto txs_json = R"([{"Tx":{"OwnerID":421,"Nonce":0},"ConfirmationScore":75111}])";
+
             struct Tx {
                 const blockchain::Transaction Transaction;
                 const unsigned ConfirmationScore;
             };
             auto txs = std::vector<Tx>{};
-
-            const auto txs_json = R"([{"Tx":{"OwnerID":421,"Nonce":0},"ConfirmationScore":75111}])";
-
-            const auto txs_obj = ::nlohmann::json::parse(txs_json);
-            for (const auto& tx : txs_obj) {
+            for (const auto& tx : ::nlohmann::json::parse(txs_json)) {
                 txs.push_back({
                     .Transaction = {
                         .OwnerID = tx["Tx"]["OwnerID"],
