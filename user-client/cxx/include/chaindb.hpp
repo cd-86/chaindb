@@ -52,8 +52,8 @@ namespace shynur::chaindb {
      */
     struct [[gnu::weak]] UserClient {
         const struct {
-            std::string host;
-            std::uint16_t tcp_port;
+            const std::string host;
+            const std::uint16_t tcp_port;
         } server;
 
         /**
@@ -65,8 +65,8 @@ namespace shynur::chaindb {
             const decltype(UserClient::server) server = {"localhost", chaindb_config::TCPPortUserService}
         ): server{server} {
             if (server.host == "localhost") {
-                std::system("chaindb.x64-linux.exe &");
-                std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
+                // std::system("chaindb.x64-linux.exe &>/dev/null &");
+                // std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
             }
         }
 
@@ -89,18 +89,27 @@ namespace shynur::chaindb {
             };
             auto owners = std::vector<Owner>{};
 
-            // TODO
+            const auto owners_json = R"([{"OwnerID":42,"ConfirmationScore":74780},{"OwnerID":421,"ConfirmationScore":74361}])";
 
-            owners.erase(
-                std::remove_if(
-                    owners.begin(), owners.end(),
+            const auto owners_obj = ::nlohmann::json::parse(owners_json);
+            for (const auto& owner : owners_obj) {
+                owners.push_back({
+                    .OwnerID = owner["OwnerID"],
+                    .ConfirmationScore = owner["ConfirmationScore"],
+                });
+            }
+
+            return [&] {
+                auto confirmed_owners = std::vector<Owner>{};
+                std::copy_if(
+                    std::cbegin(owners), std::cend(owners),
+                    std::back_inserter(confirmed_owners),
                     [&](const auto& owner) {
-                        return owner.ConfirmationScore < required_confirmation_score;
+                        return owner.ConfirmationScore > required_confirmation_score;
                     }
-                ),
-                owners.end()
-            );
-            return owners;
+                );
+                return confirmed_owners;
+            }();
         }
 
         /**
@@ -123,18 +132,37 @@ namespace shynur::chaindb {
             };
             auto txs = std::vector<Tx>{};
 
-            // TODO
+            const auto txs_json = R"([{"Tx":{"OwnerID":421,"Nonce":0},"ConfirmationScore":75111}])";
 
-            txs.erase(
-                std::remove_if(
-                    txs.begin(), txs.end(),
+            const auto txs_obj = ::nlohmann::json::parse(txs_json);
+            for (const auto& tx : txs_obj) {
+                txs.push_back({
+                    .Transaction = {
+                        .OwnerID = tx["Tx"]["OwnerID"],
+                        .Nonce = tx["Tx"]["Nonce"],
+                        .Data = [&]() -> std::string {
+                            try {
+                                return tx["Tx"].at("Data");
+                            } catch (const ::nlohmann::json::out_of_range&) {
+                                return "";
+                            }
+                        }(),
+                    },
+                    .ConfirmationScore = tx["ConfirmationScore"],
+                });
+            }
+
+            return [&]() {
+                auto confirmed_txs = std::vector<Tx>{};
+                std::copy_if(
+                    std::cbegin(txs), std::cend(txs),
+                    std::back_inserter(confirmed_txs),
                     [&](const auto& tx) {
-                        return tx.ConfirmationScore < required_confirmation_score;
+                        return tx.ConfirmationScore > required_confirmation_score;
                     }
-                ),
-                txs.end()
-            );
-            return txs;
+                );
+                return confirmed_txs;
+            }();
         }
 
         /**
@@ -155,6 +183,12 @@ namespace shynur::chaindb {
             const blockchain::Transaction transaction,
             const std::uint32_t required_confirmation_score
         ) const -> std::future<bool> {
+            const auto tx_obj = ::nlohmann::json{
+                {"OwnerID", transaction.OwnerID},
+                {"Nonce", transaction.Nonce},
+                {"Data", transaction.Data},
+            };
+
             return std::async(
                 [](){
                     // TODO
