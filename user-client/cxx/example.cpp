@@ -62,9 +62,13 @@ int main() {
                     unsigned nonce;
                     std::cin >> nonce;
 
-                    std::cout << "Data=";
-                    std::string data;
-                    std::cin >> data;
+                    std::cout << "Data: ";
+                    const auto data = [] {
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        auto input_line = std::string{};
+                        std::getline(std::cin, input_line);
+                        return input_line;
+                    }();
 
                     std::cout << "(默认是 0) Confirmation Score >= ";
                     const auto confirmation = [] -> unsigned {
