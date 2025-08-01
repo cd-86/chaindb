@@ -62,14 +62,6 @@ int main() {
                     unsigned nonce;
                     std::cin >> nonce;
 
-                    std::cout << "Data: ";
-                    const auto data = [] {
-                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                        auto input_line = std::string{};
-                        std::getline(std::cin, input_line);
-                        return input_line;
-                    }();
-
                     std::cout << "(默认是 0) Confirmation Score >= ";
                     const auto confirmation = [] -> unsigned {
                         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -78,6 +70,13 @@ int main() {
                         if (confirmation.empty())
                             return 0;
                         return std::stoul(confirmation);
+                    }();
+
+                    std::cout << "Data: ";
+                    const auto data = [] {
+                        auto input_line = std::string{};
+                        std::getline(std::cin, input_line);
+                        return input_line;
                     }();
 
                     const auto ok = uc.Insert({owner_id, nonce, data}, confirmation);
