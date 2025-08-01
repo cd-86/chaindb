@@ -53,7 +53,6 @@ namespace shynur::chaindb {
      */
     struct [[gnu::weak]] UserClient {
         const std::string origin;
-        httplib::Client client;
 
         /**
          * @note 如果 server_host 是 "localhost", 则会尝试启动一个本地的
@@ -63,7 +62,7 @@ namespace shynur::chaindb {
         UserClient(
             const std::string origin
                 = "http://localhost:" + std::to_string(chaindb_config::TCPPortUserService)
-        ): origin{origin}, client{this->origin} {
+        ): origin{origin} {
             if (this->origin.find("http://localhost:") == 0) {
                 // std::system("chaindb.x64-linux.exe &>/dev/null &");
                 // std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
@@ -84,7 +83,7 @@ namespace shynur::chaindb {
          */
         auto ListOwners(const unsigned required_confirmation_score = 0) const {
             const auto owners_json = [this] {
-                const auto resp = this->client.Get("/api/v1/owners");
+                const auto resp = httplib::Client{this->origin}.Get("/api/v1/owners");
 
                 if (!resp)
                     throw std::runtime_error{"[shynur/chaindb] HTTP failed"};
@@ -138,7 +137,7 @@ namespace shynur::chaindb {
             const unsigned required_confirmation_score = 0
         ) const {
             const auto txs_json = [&, this] {
-                const auto resp = this->client.Get(
+                const auto resp = httplib::Client{this->origin}.Get(
                     "/api/v1/transactions?owner=" + std::to_string(owner)
                 );
 
@@ -213,7 +212,7 @@ namespace shynur::chaindb {
                 {"Data", transaction.Data},
             }.dump(4);
 
-            const auto resp = this->client.Post(
+            const auto resp = httplib::Client{this->origin}.Post(
                 "/api/v1/transactions?confirmation=" + std::to_string(required_confirmation_score),
                 tx_json,
                 "application/json"
