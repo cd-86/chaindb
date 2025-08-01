@@ -1,6 +1,7 @@
 #pragma once
 #include <bits/stdc++.h>
-#include "nlohmann/json.hpp"
+#include "nlohmann/json/single_include/nlohmann/json.hpp"
+#include "yhirose/cpp-httplib/httplib.h"
 using namespace std::literals;
 
 namespace shynur::chaindb {

@@ -1,3 +1,6 @@
 [submodule "user-client/cxx/include/nlohmann/json"]
 	path = user-client/cxx/include/nlohmann/json
 	url = https://github.com/nlohmann/json.git
+[submodule "user-client/cxx/include/yhirose/cpp-httplib"]
+	path = user-client/cxx/include/yhirose/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
