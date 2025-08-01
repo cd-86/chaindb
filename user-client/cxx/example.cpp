@@ -35,8 +35,7 @@ int main() {
                                   << "ConfirmationScore: " << confirmation;
                         if (!transaction.Data.empty())
                             std::cout << '\t' << "Data: " << transaction.Data;
-                        else
-                            std::cout << '\n';
+                        std::cout << '\n';
                     }
                 }
                     break;
