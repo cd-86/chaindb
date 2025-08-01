@@ -57,7 +57,12 @@ int main() {
                     unsigned confirmation;
                     std::cin >> confirmation;
 
-                    uc.Insert({owner_id, nonce, data}, confirmation);
+                    const auto ok = uc.Insert({owner_id, nonce, data}, confirmation);
+                    if (ok)
+                        std::cout << "Insert OK";
+                    else
+                        std::cout << "Insert Failed";
+                    std::cout << '\n';
                 }
             }
         } catch (const std::exception& e) {
