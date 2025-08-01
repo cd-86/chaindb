@@ -52,10 +52,8 @@ namespace shynur::chaindb {
      *       服务器正在同步数据时, 会阻塞较久.
      */
     struct [[gnu::weak]] UserClient {
-        const struct {
-            const std::string host;
-            const std::uint16_t tcp_port;
-        } server;
+        const std::string website;
+        httplib::Client client;
 
         /**
          * @note 如果 server_host 是 "localhost", 则会尝试启动一个本地的
@@ -63,9 +61,10 @@ namespace shynur::chaindb {
          *       完成.  如果数据未同步, 后续的请求会继续阻塞, 无需关心.
          */
         UserClient(
-            const decltype(UserClient::server) server = {"localhost", chaindb_config::TCPPortUserService}
-        ): server{server} {
-            if (server.host == "localhost") {
+            const std::string website
+                = "http://localhost:" + std::to_string(chaindb_config::TCPPortUserService)
+        ): website{website}, client{this->website} {
+            if (website.starts_with("http://localhost:")) {
                 // std::system("chaindb.x64-linux.exe &>/dev/null &");
                 // std::this_thread::sleep_for(chaindb_config::DiscoveryInterval);
             }
