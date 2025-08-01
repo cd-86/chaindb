@@ -12,11 +12,11 @@ int main() {
             switch (op) {
                 case 'o': {
                     std::cout << "(默认是 0) Confirmation Score >= ";
-                    const unsigned confirmation = [] {
+                    const auto confirmation = [] -> unsigned {
                         auto confirmation = std::string{};
                         std::getline(std::cin, confirmation);
                         if (confirmation.empty())
-                            return 0;
+                            return 0ul;
                         return std::stoul(confirmation);
                     }();
 
@@ -31,11 +31,11 @@ int main() {
                     std::cin >> owner;
 
                     std::cout << "(默认是 0) Confirmation Score >= ";
-                    const unsigned confirmation = [] {
+                    const auto confirmation = [] -> unsigned {
                         auto confirmation = std::string{};
                         std::getline(std::cin, confirmation);
                         if (confirmation.empty())
-                            return 0;
+                            return 0ul;
                         return std::stoul(confirmation);
                     }();
 
@@ -63,7 +63,7 @@ int main() {
                     std::cin >> data;
 
                     std::cout << "(默认是 0) Confirmation Score >= ";
-                    const unsigned confirmation = [] {
+                    const auto confirmation = [] -> unsigned {
                         auto confirmation = std::string{};
                         std::getline(std::cin, confirmation);
                         if (confirmation.empty())
