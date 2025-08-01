@@ -11,9 +11,14 @@ int main() {
         try {
             switch (op) {
                 case 'o': {
-                    std::cout << "Confirmation Score >= ";
-                    unsigned confirmation;
-                    std::cin >> confirmation;
+                    std::cout << "(默认是 0) Confirmation Score >= ";
+                    const unsigned confirmation = [] {
+                        auto confirmation = std::string{};
+                        std::getline(std::cin, confirmation);
+                        if (confirmation.empty())
+                            return 0;
+                        return std::stoul(confirmation);
+                    }();
 
                     for (const auto& [owner, confirmation] : uc.ListOwners(confirmation))
                         std::cout << "OwnerID: " << owner << '\t'
@@ -25,9 +30,14 @@ int main() {
                     unsigned owner;
                     std::cin >> owner;
 
-                    std::cout << "Confirmation Score >= ";
-                    unsigned confirmation;
-                    std::cin >> confirmation;
+                    std::cout << "(默认是 0) Confirmation Score >= ";
+                    const unsigned confirmation = [] {
+                        auto confirmation = std::string{};
+                        std::getline(std::cin, confirmation);
+                        if (confirmation.empty())
+                            return 0;
+                        return std::stoul(confirmation);
+                    }();
 
                     for (const auto& [transaction, confirmation] : uc.ListTransactionsOwnedBy(owner, confirmation)) {
                         std::cout << "OwnerID: " << transaction.OwnerID << '\t'
@@ -52,9 +62,14 @@ int main() {
                     std::string data;
                     std::cin >> data;
 
-                    std::cout << "Confirmation Score >= ";
-                    unsigned confirmation;
-                    std::cin >> confirmation;
+                    std::cout << "(默认是 0) Confirmation Score >= ";
+                    const unsigned confirmation = [] {
+                        auto confirmation = std::string{};
+                        std::getline(std::cin, confirmation);
+                        if (confirmation.empty())
+                            return 0;
+                        return std::stoul(confirmation);
+                    }();
 
                     const auto ok = uc.Insert({owner_id, nonce, data}, confirmation);
                     if (ok)

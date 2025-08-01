@@ -221,7 +221,7 @@ namespace shynur::chaindb {
             );
             if (!resp)
                 throw std::runtime_error{"[shynur/chaindb] HTTP failed"};
-            return resp->status / 100 != 2;
+            return resp->status / 100 == 2;
         }
     };
 }
