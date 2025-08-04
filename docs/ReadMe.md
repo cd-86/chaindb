@@ -60,7 +60,7 @@
 
 概念上, ChainDB 是一个巨大的 `OwnerID:uint` $\mapsto$ `[history_1, history_2, ...]` 的 map.
 
-ChainDB 中存储一系列 transaction, 每条 transaction 存储 `OwnerID` (key) 和 `Data` (value), 此外还有一个 `Nonce` 字段 (自然数).  <br />
+ChainDB 中存储一系列 transactions, 每条 transaction 存储 `OwnerID` (key) 和 `Data` (value), 此外还有一个 `Nonce` 字段 (自然数).  <br />
 Transaction 代表一条修订记录.
 例如,
 
@@ -112,9 +112,20 @@ Content-Type: application/json
 }
 ```
 
-请求将 transaction 打包进区块, 并追加到由 某个/某些 节点 (不一定是 localhost) 各自维护的区块链中.
+请求将上述 transaction 打包进区块, 并追加到由 某个/某些 节点 (不一定是 localhost) 各自维护的区块链中.
 
 #### 区块链
+
+所有的链都 fork 自同一个链, 这些链此后又会 fork 出新的链.
+
+```
+              +--- [block-2]     +--- [block-5]
+              |                  |     ^ 节点 A 的工作链, 一段时间后大概率会切换到 [block-9] 所属链
+[block-1] <---+--- [block-3] <---+
+              |                  |                    v 节点 B 的工作链, 即将 fork 出新链, 但可能被丢弃
+              |                  +--- [block-6] <--- [block-7] <--- [block-8] <--- [block-9]
+              +--- [block-4]                                                        ^ 节点 C 的工作链, [block-9] 即将被广播
+```
 
 > 最长链作为整个网络的共识链.
 
@@ -128,19 +139,55 @@ Content-Type: application/json
 > 否则可能会导致新 Wi-Fi 网络下所有节点的数据被本设备的数据覆盖.
 
 因此, 网络中的多条链最终只有一条会成为 **主干**.  <br />
-ChainDB 在概率上控制 **主干** 的增长速度为 1.x sec/block.
+ChainDB 在概率上控制 **主干** 的增长速度为 1.x sec/block (试验中是 1.25), 即 *平均区块时间*.
+
+> [!IMPORTANT]  
+> 如果出于某些原因, 一个网络分裂成了两个, 那么这两个网络各自的 *平均区块时间* 仍然不变.
+> ChainDB 将任何网络视为独立且平等的, 甚至是单一节点网络.
 
 ### Confirmation Score
 
-在分布式场景下, 一条 transaction 可能未能及时同步到其它所有主机, 或者最终因为不被区块链网络认可而被丢弃.
-没有任何办法能确保一条 transaction 最终会被所有主机认可.
+ChainDB 实现了最终一致性.
 
-你可选择等待足够久的时间.
-如果一条 transaction 一直存在于本地 ChainDB, 未被其主动丢弃,
-那么随着时间的推移, 该 transaction 未被成功刻进区块链的概率是 **指数下降的**.
+`ConfirmationScore` 表示链上某个可查询到的 (说明该链此时尚未被丢弃) 区块后追加了几个新区块.
+新区块越多, 说明该链 (或者叫 fork) 越有可能成为最长链.  <br />
+一个区块的 `ConfirmationScore` 平均一个 *平均区块时间* 增加 1.
 
-反映一条 transaction 同步程度的指标是 `ConfirmationScore`.
-分数越高, 该 transaction 刻录失败的概率越低.
+> [!TIP]
+> 一个区块的 `ConfirmationScore=0` 说明它是某个 fork 的链尾.
 
-ChainDB 不提供指导, 用户应根据实际使用环境决定 `ConfirmationScore` 的最低阈值.
-这是 比特币 交易的真实情况, ChainDB 遵循了 比特币 的设计.
+Transaction 的 `ConfirmationScore` 就是该 transaction 所属区块的 `ConfirmationScore`.
+`ConfirmationScore` 反映 transaction 所属链最终成为共识链的概率.
+
+### 数学证明
+
+#### 最终一致性
+
+假设 A 维护的链的高度是 $H_a$, B 的是 $H_b$, 且
+
+$$
+z = H_a - H_b \gt 0
+$$
+
+- A 链每个 *平均区块时间* 生成一个区块;
+- 令 $l = \\text{网络丢包率}$, 如果丢包则节点 B 不会切换到 A 链, 因为它没有收到 A 的区块广播.
+  则 B 链每个 *平均区块时间* 有 $l\\times 50\\%$ 的概率生成一个区块.
+
+当 B 链落后 A 链 $z$ 个区块时, B 链追上 A 链的概率
+
+$$
+p_z = (\frac{l\times 50\\%}{50\\%})^z = l^z \in [0, 1)
+$$
+
+($l\neq1$, 否则这根本不是一个网络, 而是两个独立的节点.)
+
+> 当 $l=50%$ 时, $p_{5}=3.125\\%$.
+
+#### 数据可信度
+
+假设用户向网络发送了一条 transaction request,
+且存在一个节点因网络不稳定而丢包 导致未接收到此 transaction request.
+
+用户 V 向另一部分节点发送了 `{"OwnerID": 666, "Nonce": 9, "Data": "Morty"}` 的 transaction request.  <br />
+但这两个 transaction requests 的 `Data` 字段有冲突.
+我们期望最终只有一个 transaction 进入主干.
