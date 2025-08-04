@@ -1,7 +1,7 @@
 SHELL = /bin/bash -O globstar
 CXX ?= c++
 CXXFLAGS :=  -Wpedantic -Wall -W -O0 -g3  \
-			-Wc99-extensions  \
+			-Wno-c99-extensions  \
 			-Wno-c++20-extensions -Wno-c++23-extensions  \
 			$(CXXFLAGS)
 
