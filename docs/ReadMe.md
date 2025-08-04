@@ -189,7 +189,7 @@ $$
 
 假设用户向网络发送了一条 transaction request,
 一段时间后, 从某个节点查询到该 transaction 的 `ConfirmationScore` 为 $c$.  <br />
-可以计算该节点所维护的链不属于 **主干** 的概率.
+可以计算该节点所维护的链属于 **主干** 的概率.
 
 建模如下:
 
