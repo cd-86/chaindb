@@ -117,9 +117,8 @@ class blockchain:
 if __name__ == "__main__":
     uc = blockchain.UserClient()
 
-    print()
-
     while True:
+        print()
         try:
             op = input("Operation (o=列出索引, t=列出数据, i=插入数据): ").strip()
             match op:
@@ -130,9 +129,7 @@ if __name__ == "__main__":
                     for owner, confirmation in uc.ListOwners(
                         confirmations=confirmations
                     ):
-                        print(
-                            f"OwnerID: {owner.OwnerID}\tConfirmationScore: {confirmation}"
-                        )
+                        print(f"OwnerID: {owner}\tConfirmationScore: {confirmation}")
                 case "t":
                     owner = int(input("OwnerID="))
                     confirmations = int(
