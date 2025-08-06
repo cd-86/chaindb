@@ -22,100 +22,100 @@ class blockchain:
         Nonce: int
         Data: str
 
-    class UserClient:
-        def __init__(
-            self, origin: str = f"http://localhost:{chaindb_config.TCPPortUserService}"
-        ):
-            self.origin: str = origin  # const
+class UserClient:
+    def __init__(
+        self, origin: str = f"http://localhost:{chaindb_config.TCPPortUserService}"
+    ):
+        self.origin: str = origin  # const
 
-            if self.origin.startswith("http://localhost:"):
-                match os.name:
-                    case "nt":
-                        # os.system("start chaindb.x64-mswindows.exe")
-                        ...
-                    case "posix":
-                        os.system("chaindb.x64-linux.exe &")
-                    case _:
-                        raise RuntimeError("当前平台不受支持")
-                time.sleep(chaindb_config.DiscoveryInterval.total_seconds())
+        if self.origin.startswith("http://localhost:"):
+            match os.name:
+                case "nt":
+                    # os.system("start chaindb.x64-mswindows.exe")
+                    ...
+                case "posix":
+                    os.system("chaindb.x64-linux.exe &")
+                case _:
+                    raise RuntimeError("当前平台不受支持")
+            time.sleep(chaindb_config.DiscoveryInterval.total_seconds())
 
-        def ListOwners(
-            self,
-            *,
-            confirmations: int = 0,
-        ) -> list:
-            resp = requests.get(f"{self.origin}/api/v1/owners")
-            if resp.status_code not in range(200, 300):
-                raise RuntimeError(
-                    f"请求失败: {resp.status_code} {resp.reason} {resp.text}"
-                )
-
-            class Owner(typing.NamedTuple):
-                OwnerID: int
-                ConfirmationScore: int
-
-            owners: list[Owner] = []
-            for owner in resp.json() or []:
-                owners.append(
-                    Owner(
-                        OwnerID=owner["OwnerID"],
-                        ConfirmationScore=owner["ConfirmationScore"],
-                    )
-                )
-
-            return [
-                owner for owner in owners if owner.ConfirmationScore >= confirmations
-            ]
-
-        def ListTransactionsOwnedBy(
-            self,
-            owner: int,
-            *,
-            confirmations: int = 0,
-        ) -> list:
-            resp = requests.get(f"{self.origin}/api/v1/transactions?owner={owner}")
-            if resp.status_code not in range(200, 300):
-                raise RuntimeError(
-                    f"请求失败: {resp.status_code} {resp.reason} {resp.text}"
-                )
-
-            class Tx(typing.NamedTuple):
-                Transaction: blockchain.Transaction
-                ConfirmationScore: int
-
-            txs: list[Tx] = []
-            for tx in resp.json() or []:
-                txs.append(
-                    Tx(
-                        Transaction=blockchain.Transaction(
-                            OwnerID=tx["Tx"]["OwnerID"],
-                            Nonce=tx["Tx"]["Nonce"],
-                            Data=tx["Tx"].get("Data", ""),
-                        ),
-                        ConfirmationScore=tx["ConfirmationScore"],
-                    )
-                )
-            return [tx for tx in txs if tx.ConfirmationScore >= confirmations]
-
-        def Insert(
-            self,
-            transaction: "blockchain.Transaction",
-            *,
-            confirmations: int,
-        ) -> bool:
-            resp = requests.post(
-                f"{self.origin}/api/v1/transactions?confirmation={confirmations}",
-                json={
-                    "OwnerID": transaction.OwnerID,
-                    "Nonce": transaction.Nonce,
-                    "Data": transaction.Data,
-                },
+    def ListOwners(
+        self,
+        *,
+        confirmations: int = 0,
+    ) -> list:
+        resp = requests.get(f"{self.origin}/api/v1/owners")
+        if resp.status_code not in range(200, 300):
+            raise RuntimeError(
+                f"请求失败: {resp.status_code} {resp.reason} {resp.text}"
             )
-            return resp.status_code in range(200, 300)
+
+        class Owner(typing.NamedTuple):
+            OwnerID: int
+            ConfirmationScore: int
+
+        owners: list[Owner] = []
+        for owner in resp.json() or []:
+            owners.append(
+                Owner(
+                    OwnerID=owner["OwnerID"],
+                    ConfirmationScore=owner["ConfirmationScore"],
+                )
+            )
+
+        return [
+            owner for owner in owners if owner.ConfirmationScore >= confirmations
+        ]
+
+    def ListTransactionsOwnedBy(
+        self,
+        owner: int,
+        *,
+        confirmations: int = 0,
+    ) -> list:
+        resp = requests.get(f"{self.origin}/api/v1/transactions?owner={owner}")
+        if resp.status_code not in range(200, 300):
+            raise RuntimeError(
+                f"请求失败: {resp.status_code} {resp.reason} {resp.text}"
+            )
+
+        class Tx(typing.NamedTuple):
+            Transaction: blockchain.Transaction
+            ConfirmationScore: int
+
+        txs: list[Tx] = []
+        for tx in resp.json() or []:
+            txs.append(
+                Tx(
+                    Transaction=blockchain.Transaction(
+                        OwnerID=tx["Tx"]["OwnerID"],
+                        Nonce=tx["Tx"]["Nonce"],
+                        Data=tx["Tx"].get("Data", ""),
+                    ),
+                    ConfirmationScore=tx["ConfirmationScore"],
+                )
+            )
+        return [tx for tx in txs if tx.ConfirmationScore >= confirmations]
+
+    def Insert(
+        self,
+        transaction: blockchain.Transaction,
+        *,
+        confirmations: int,
+    ) -> bool:
+        resp = requests.post(
+            f"{self.origin}/api/v1/transactions?confirmation={confirmations}",
+            json={
+                "OwnerID": transaction.OwnerID,
+                "Nonce": transaction.Nonce,
+                "Data": transaction.Data,
+            },
+        )
+        return resp.status_code in range(200, 300)
 
 
 if __name__ == "__main__":
-    uc = blockchain.UserClient()
+    uc = UserClient()
 
     while True:
         print()
