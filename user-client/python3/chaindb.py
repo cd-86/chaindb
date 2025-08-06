@@ -135,8 +135,9 @@ if __name__ == "__main__":
                     confirmations = int(
                         input("(默认是 0) Confirmation Score >= ") or "0"
                     )
-                    for transaction, confirmation in uc.ListTransactionsOwnedBy(
-                        owner, confirmations=confirmations
+                    for transaction, confirmation in sorted(
+                        uc.ListTransactionsOwnedBy(owner, confirmations=confirmations),
+                        key=lambda transaction: transaction.Transaction.Nonce,
                     ):
                         print(
                             f"OwnerID: {transaction.OwnerID}\tNonce: {transaction.Nonce}\tConfirmationScore: {confirmation}{transaction.Data and f'\tData: {transaction.Data}'}"
