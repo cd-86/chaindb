@@ -84,7 +84,7 @@ class blockchain:
                 ConfirmationScore: int
 
             txs: list[Tx] = []
-            for tx in json.loads(resp.json()) or []:
+            for tx in resp.json() or []:
                 txs.append(
                     Tx(
                         Transaction=blockchain.Transaction(
