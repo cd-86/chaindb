@@ -37,7 +37,7 @@ func registerTxService(server *http.ServeMux) {
 // GET /owners
 func getOwnersHandler(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(
-		theChain.ListOwners(),
+		theChain.ListOwners()[:],
 	)
 }
 
