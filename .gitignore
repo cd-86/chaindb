@@ -10,6 +10,7 @@
 $RECYCLE.BIN/
 
 ?*.exe
+__pycache__/
 
 ?*.pb.go
 

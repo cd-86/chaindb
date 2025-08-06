@@ -1,4 +1,4 @@
-#! python3.13 -m
+#! python3.13
 
 import datetime
 import typing
