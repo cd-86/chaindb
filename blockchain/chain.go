@@ -18,7 +18,6 @@ func (chain *Chain) ListTxsOwnedBy(owner uint32) (
 		ConfirmationScore uint32
 	},
 ) {
-
 	var first_tx_found bool
 
 	head := chain.Head()
