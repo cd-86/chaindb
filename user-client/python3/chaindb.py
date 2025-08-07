@@ -4,7 +4,6 @@ import datetime
 import typing
 import os
 import time
-import json
 import sys
 import requests
 
@@ -21,6 +20,7 @@ class blockchain:
         OwnerID: int
         Nonce: int
         Data: str
+
 
 class UserClient:
     def __init__(
@@ -63,9 +63,7 @@ class UserClient:
                 )
             )
 
-        return [
-            owner for owner in owners if owner.ConfirmationScore >= confirmations
-        ]
+        return [owner for owner in owners if owner.ConfirmationScore >= confirmations]
 
     def ListTransactionsOwnedBy(
         self,
