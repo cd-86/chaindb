@@ -71,6 +71,15 @@ class UserClient:
         *,
         confirmations: int = 0,
     ) -> list:
+        """
+        返回格式: [
+            NamedTuple(
+                Transaction(OwnerID, Nonce, Data),
+                ConfirmationScore,
+            ),
+            ...
+        ]
+        """
         resp = requests.get(f"{self.origin}/api/v1/transactions?owner={owner}")
         if resp.status_code not in range(200, 300):
             raise RuntimeError(
@@ -101,6 +110,11 @@ class UserClient:
         *,
         confirmations: int,
     ) -> bool:
+        """
+        如果插入成功, 返回 True;
+        如果失败, 返回 False;
+        如果超时, 也返回 False, 但不一定代表插入失败, 可能是请求在服务端的队列里阻塞太久.
+        """
         resp = requests.post(
             f"{self.origin}/api/v1/transactions?confirmation={confirmations}",
             json={
