@@ -1,4 +1,4 @@
-#! /bin/python3
+#! python3.13
 
 from . import chaindb
 
@@ -10,7 +10,7 @@ RequiredConfirmations: int = 10
 
 uc = chaindb.UserClient()
 
-rbk_available_owners = range(100_0000, 200_0000)
+AvailableOwners = range(100_0000, 200_0000)
 
 
 def Owners() -> list[int]:
@@ -18,7 +18,7 @@ def Owners() -> list[int]:
     获取 ChainDB 里的 keys (也称 owners).
     """
     owners = uc.ListOwners(confirmations=RequiredConfirmations)
-    return [owner.OwnerID for owner in owners if owner.OwnerID in rbk_available_owners]
+    return [owner.OwnerID for owner in owners if owner.OwnerID in AvailableOwners]
 
 
 def Get(owner: int) -> list[str]:
@@ -40,8 +40,7 @@ def Insert(owner: int, data: str) -> int:
     返回被插入的数据在 owner 的数组中的索引.
     """
     owner = (
-        owner % (rbk_available_owners.stop - rbk_available_owners.start)
-        + rbk_available_owners.start
+        owner % (AvailableOwners.stop - AvailableOwners.start) + AvailableOwners.start
     )
 
     nonce = len(Get(owner))
