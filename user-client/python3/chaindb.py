@@ -34,7 +34,7 @@ class UserClient:
                     # os.system("start chaindb.x64-mswindows.exe")
                     ...
                 case "posix":
-                    os.system("chaindb.x64-linux.exe &")
+                    os.system("""bash -c 'chaindb.x64-linux.exe &'""")
                 case _:
                     raise RuntimeError("当前平台不受支持")
             time.sleep(chaindb_config.DiscoveryInterval.total_seconds())
