@@ -43,8 +43,8 @@ func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
 				grpc.WithDefaultCallOptions(
 					grpc.MaxCallSendMsgSize(math.MaxInt32),
 					grpc.MaxCallRecvMsgSize(math.MaxInt32),
-					grpc.WaitForReady(true),
 					grpc.UseCompressor(encoding.Identity),
+					grpc.WaitForReady(false),
 				),
 				grpc.WithInitialConnWindowSize(math.MaxInt32),
 				grpc.WithInitialWindowSize(math.MaxInt32),
