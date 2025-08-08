@@ -17,10 +17,10 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var blockCacheDetached sync.Map
+var BlockCacheDetached sync.Map
 
 func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
-	cached_detached_block, exist := blockCacheDetached.Load(blk_uuid)
+	cached_detached_block, exist := BlockCacheDetached.Load(blk_uuid)
 	if exist {
 		return cached_detached_block.(blockchain.Block), nil
 	}
@@ -77,7 +77,7 @@ func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
 		log.Printf("[  Pull ] 拉取区块失败, UUID=%d, 错误: %v\n", blk_uuid, err)
 		return blockchain.Block{}, err
 	}
-	_, no_store := blockCacheDetached.LoadOrStore(blk_uuid, blk)
+	_, no_store := BlockCacheDetached.LoadOrStore(blk_uuid, blk)
 	if !no_store {
 		log.Printf(
 			"[  Pull ] 拉取到区块 Block.UUID=%d, Block.Height=%d\n",
@@ -144,7 +144,7 @@ func pull(chain *blockchain.Chain, head blockchain.Block) {
 	}
 	go func() {
 		for _, c := range candidates {
-			blockCacheDetached.Delete(c.UUID)
+			BlockCacheDetached.Delete(c.UUID)
 		}
 	}()
 }

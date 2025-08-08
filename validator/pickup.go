@@ -38,7 +38,7 @@ func StartTryPickBlocks(chain *blockchain.Chain) {
 
 			var head blockchain.Block
 			head.FromGob(blk_obj[:n])
-			blockCacheDetached.Store(head.UUID, head)
+			BlockCacheDetached.Store(head.UUID, head)
 
 			if head.Height > chain.Head().Height {
 				go pull(chain, head)

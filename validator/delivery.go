@@ -56,7 +56,7 @@ func (s blockPCDNServer) GetBlock(
 	ctx context.Context,
 	arg *block_cdn.BlockUUID,
 ) (*block_cdn.BlockGob, error) {
-	blk, ok := blockCacheDetached.Load(arg.GetUUID())
+	blk, ok := BlockCacheDetached.Load(arg.GetUUID())
 	if !ok {
 		blk, ok = blockchain.BlockCache.Load(arg.GetUUID())
 		if !ok {

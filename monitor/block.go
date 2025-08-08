@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/shynur/chaindb/blockchain"
+	"github.com/shynur/chaindb/validator"
 )
 
 func registerBlockService(server *http.ServeMux) {
@@ -26,10 +27,13 @@ func getBlocksUUIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	block, ok := blockchain.BlockCache.Load(uint64(uuid))
+	block, ok := validator.BlockCacheDetached.Load(uint64(uuid))
 	if !ok {
-		http.NotFound(w, r)
-		return
+		block, ok = blockchain.BlockCache.Load(uint64(uuid))
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
 	}
 
 	w.Header().Set("Cache-Control", "public, immutable, max-age=31536000")
