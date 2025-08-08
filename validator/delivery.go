@@ -12,6 +12,7 @@ import (
 	"github.com/shynur/chaindb/validator/block_cdn"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 )
 
@@ -31,10 +32,12 @@ func StartBlockDeliveryServer() {
 	log.Printf("[  PCDN ] 区块 PCDN 服务器开始监听端口: %d", chaindb_config.TCPPortBlockPCDN)
 
 	server := grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
 		// 放开 gRPC 的所有限制:
-		// grpc.InitialConnWindowSize(math.MaxInt32),
-		// grpc.InitialWindowSize(math.MaxInt32),
+		grpc.InitialConnWindowSize(math.MaxInt32),
+		grpc.InitialWindowSize(math.MaxInt32),
 		grpc.MaxHeaderListSize(math.MaxUint32),
+		grpc.MaxSendMsgSize(math.MaxInt32),
 		grpc.MaxRecvMsgSize(math.MaxInt32),
 		// grpc.StaticConnWindowSize(math.MaxInt32),
 		// grpc.StaticStreamWindowSize(math.MaxInt32),

@@ -15,6 +15,7 @@ import (
 	"github.com/shynur/chaindb/validator/block_cdn"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/encoding"
 )
 
 var BlockCacheDetached sync.Map
@@ -39,8 +40,14 @@ func pullOneBlock(blk_uuid uint64) (blk blockchain.Block, err error) {
 				),
 				grpc.WithTransportCredentials(insecure.NewCredentials()),
 				// 放开 gRPC 的所有限制:
-				// rpc.WithInitialConnWindowSize(math.MaxInt32),
-				// grpc.WithInitialWindowSize(math.MaxInt32),
+				grpc.WithDefaultCallOptions(
+					grpc.MaxCallSendMsgSize(math.MaxInt32),
+					grpc.MaxCallRecvMsgSize(math.MaxInt32),
+					grpc.WaitForReady(true),
+					grpc.UseCompressor(encoding.Identity),
+				),
+				grpc.WithInitialConnWindowSize(math.MaxInt32),
+				grpc.WithInitialWindowSize(math.MaxInt32),
 				grpc.WithMaxHeaderListSize(math.MaxUint32),
 				// grpc.WithStaticConnWindowSize(math.MaxInt32),
 				// grpc.WithStaticStreamWindowSize(math.MaxInt32),
