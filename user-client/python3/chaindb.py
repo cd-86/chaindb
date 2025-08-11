@@ -42,7 +42,8 @@ class UserClient:
                     subprocess.Popen(
                         ["chaindb.x64-mswindows.exe"],
                         creationflags=subprocess.DETACHED_PROCESS
-                        | subprocess.CREATE_NEW_PROCESS_GROUP,
+                        | subprocess.CREATE_NEW_PROCESS_GROUP
+                        | subprocess.CREATE_NO_WINDOW,
                         stderr=open("chaindb.log.txt", "a"),
                     )
                 except FileNotFoundError:
@@ -64,7 +65,8 @@ class UserClient:
                             subprocess.Popen(
                                 [rand_temp_exe_path],
                                 creationflags=subprocess.DETACHED_PROCESS
-                                | subprocess.CREATE_NEW_PROCESS_GROUP,
+                                | subprocess.CREATE_NEW_PROCESS_GROUP
+                                | subprocess.CREATE_NO_WINDOW,
                                 stderr=open("chaindb.log.txt", "a"),
                             )
             elif platform.uname().system == "Linux" and platform.uname().machine in {
