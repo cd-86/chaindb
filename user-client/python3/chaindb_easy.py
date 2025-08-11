@@ -1,4 +1,4 @@
-#! python3.13
+#! python3.13 -i
 
 from . import chaindb
 
