@@ -11,7 +11,7 @@
 
 ## 基础工具
 
-- bash
+- bash (Linux)
 - ping
 
 # 测试

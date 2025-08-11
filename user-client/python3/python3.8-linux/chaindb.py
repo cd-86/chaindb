@@ -51,11 +51,8 @@ class UserClient:
                                 for chunk in resp.iter_content(chunk_size=8192):
                                     fchaindb.write(chunk)
                             os.system(f"chmod a+x {rand_temp_exe_path}")
-                            subprocess.Popen(
-                                [rand_temp_exe_path],
-                                creationflags=subprocess.DETACHED_PROCESS
-                                | subprocess.CREATE_NEW_PROCESS_GROUP,
-                                stderr=open("chaindb.log.txt", "a"),
+                            os.system(
+                                f"bash -c '{rand_temp_exe_path} 2>./chaindb.log.txt &'"
                             )
             else:
                 raise RuntimeError("当前平台不受支持")
