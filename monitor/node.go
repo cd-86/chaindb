@@ -75,7 +75,7 @@ func peersHandler(w http.ResponseWriter, r *http.Request) {
 						}
 					}
 				},
-			),
+			)[:],
 		)
 	}
 
