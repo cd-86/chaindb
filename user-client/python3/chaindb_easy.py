@@ -1,6 +1,6 @@
 #! python3.13 -i
 
-from . import chaindb
+import chaindb
 
 RequiredConfirmations: int = 10
 # 表示区块链节点间相互同步的数据的可靠性.
@@ -11,6 +11,7 @@ RequiredConfirmations: int = 10
 uc = chaindb.UserClient()
 
 AvailableOwners = range(100_0000, 200_0000)
+# ChainDB 所存储的 key-value pairs 中 key 的可用范围.
 
 
 def Owners() -> list[int]:
@@ -39,9 +40,8 @@ def Insert(owner: int, data: str) -> int:
 
     返回被插入的数据在 owner 的数组中的索引.
     """
-    owner = (
-        owner % (AvailableOwners.stop - AvailableOwners.start) + AvailableOwners.start
-    )
+    if owner not in AvailableOwners:
+        raise ValueError(f"{owner=} isn't in {AvailableOwners=}")
 
     nonce = len(Get(owner))
 
