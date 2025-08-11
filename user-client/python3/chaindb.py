@@ -7,6 +7,7 @@ import tempfile
 import os
 import time
 import sys
+import subprocess
 import requests
 
 
@@ -33,27 +34,39 @@ class UserClient:
         if self.origin.startswith("http://localhost:"):
             match os.name:
                 case "nt":
-                    os.system("start chaindb.x64-mswindows.exe")
-                    with requests.get(
-                        "https://github.com/shynur/chaindb/releases/latest/download/chaindb.x64-mswindows.exe",
-                        stream=True,
-                        timeout=2,
-                    ) as resp:
-                        if resp.ok:
-                            rand_temp_exe_path = os.path.join(
-                                tempfile.gettempdir(),
-                                str(random.randint(0, 2**32)),
-                                "chaindb.x64-mswindows.exe",
-                            )
-                            with open(
-                                rand_temp_exe_path,
-                                "wb",
-                            ) as fchaindb:
-                                for chunk in resp.iter_content(chunk_size=8192):
-                                    fchaindb.write(chunk)
-                            os.system(f"start {rand_temp_exe_path}")
+                    try:
+                        subprocess.Popen(
+                            ["chaindb.x64-mswindows.exe"],
+                            creationflags=subprocess.DETACHED_PROCESS
+                            | subprocess.CREATE_NEW_PROCESS_GROUP,
+                            stderr=open("chaindb.log.txt", "a"),
+                        )
+                    except FileNotFoundError:
+                        with requests.get(
+                            "https://github.com/shynur/chaindb/releases/latest/download/chaindb.x64-mswindows.exe",
+                            stream=True,
+                        ) as resp:
+                            if resp.ok:
+                                rand_temp_exe_path = os.path.join(
+                                    tempfile.gettempdir(),
+                                    f"chaindb.x64-mswindows.__{random.randint(0, 2**32)}__.exe",
+                                )
+                                with open(
+                                    rand_temp_exe_path,
+                                    "xb",
+                                ) as fchaindb:
+                                    for chunk in resp.iter_content(chunk_size=8192):
+                                        fchaindb.write(chunk)
+                                subprocess.Popen(
+                                    [rand_temp_exe_path],
+                                    creationflags=subprocess.DETACHED_PROCESS
+                                    | subprocess.CREATE_NEW_PROCESS_GROUP,
+                                    stderr=open("chaindb.log.txt", "a"),
+                                )
                 case "posix":
-                    os.system("""bash -c 'chaindb.x64-linux.exe &'""")
+                    os.system(
+                        """bash -c 'chaindb.x64-linux.exe 2>./chaindb.log.txt &'"""
+                    )
                 case _:
                     raise RuntimeError("当前平台不受支持")
             time.sleep(chaindb_config.DiscoveryInterval.total_seconds())

@@ -16,3 +16,5 @@ __pycache__/
 
 # codecov
 /coverage.txt
+
+?*.log.txt
