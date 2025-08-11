@@ -12,12 +12,15 @@
 
          (mode . column-number)
 
+         (project-vc-merge-submodules . nil)
+
          (sentence-end-double-space . t)
 
          (mode . rainbow)
 
-         (eval . (when (and buffer-file-name (string-match-p "\\.log\\.txt$" buffer-file-name))
-                   (auto-revert-tail-mode)))
+         (eval . (when buffer-file-name
+                   (when (string-match-p "\\.log\\.txt$" buffer-file-name)
+                     (auto-revert-tail-mode))))
 
          (treesit-font-lock-level . 4)))
  (makefile-mode . ((whitespace-style . (face tabs))
