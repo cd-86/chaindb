@@ -31,4 +31,5 @@
          (treesit-font-lock-level . 4)))
  (makefile-mode . ((whitespace-style . (face tabs))
                    (mode . whitespace)))
- (yaml-mode . ((indent-tabs-mode . nil))))
+ (yaml-mode . ((indent-tabs-mode . nil)
+               (tab-width . 2))))
