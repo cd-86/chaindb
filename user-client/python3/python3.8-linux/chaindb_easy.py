@@ -1,5 +1,3 @@
-#! python3.13
-
 from . import chaindb
 
 RequiredConfirmations: int = 10
@@ -13,7 +11,7 @@ uc = chaindb.UserClient()
 AvailableOwners = range(100_0000, 200_0000)
 
 
-def Owners() -> list[int]:
+def Owners() -> list:
     """
     获取 ChainDB 里的 keys (也称 owners).
     """
@@ -21,7 +19,7 @@ def Owners() -> list[int]:
     return [owner.OwnerID for owner in owners if owner.OwnerID in AvailableOwners]
 
 
-def Get(owner: int) -> list[str]:
+def Get(owner: int) -> list:
     """
     按 owner 获取 value, value 是一个数组, 按插入时间的顺序排列.
     """

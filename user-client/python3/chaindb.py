@@ -7,7 +7,6 @@ import tempfile
 import os
 import time
 import platform
-import stat
 import sys
 import subprocess
 import requests
