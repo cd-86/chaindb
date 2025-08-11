@@ -2,6 +2,8 @@
 
 import datetime
 import typing
+import random
+import tempfile
 import os
 import time
 import sys
@@ -31,8 +33,25 @@ class UserClient:
         if self.origin.startswith("http://localhost:"):
             match os.name:
                 case "nt":
-                    # os.system("start chaindb.x64-mswindows.exe")
-                    ...
+                    os.system("start chaindb.x64-mswindows.exe")
+                    with requests.get(
+                        "https://github.com/shynur/chaindb/releases/latest/download/chaindb.x64-mswindows.exe",
+                        stream=True,
+                        timeout=2,
+                    ) as resp:
+                        if resp.ok:
+                            rand_temp_exe_path = os.path.join(
+                                tempfile.gettempdir(),
+                                str(random.randint(0, 2**32)),
+                                "chaindb.x64-mswindows.exe",
+                            )
+                            with open(
+                                rand_temp_exe_path,
+                                "wb",
+                            ) as fchaindb:
+                                for chunk in resp.iter_content(chunk_size=8192):
+                                    fchaindb.write(chunk)
+                            os.system(f"start {rand_temp_exe_path}")
                 case "posix":
                     os.system("""bash -c 'chaindb.x64-linux.exe &'""")
                 case _:
