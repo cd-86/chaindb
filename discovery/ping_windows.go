@@ -1,10 +1,18 @@
 package discovery
 
-import "os/exec"
+import (
+	"os/exec"
+	"syscall"
+)
 
 func ping(ip string) (err error) {
 	proc_ping := exec.Command("ping", "-n", "1", ip)
+
+	if proc_ping.SysProcAttr == nil {
+		proc_ping.SysProcAttr = &syscall.SysProcAttr{}
+	}
 	proc_ping.SysProcAttr.HideWindow = true
+
 	err = proc_ping.Run()
 
 	if err != nil {
