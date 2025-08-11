@@ -9,7 +9,9 @@ import (
 func ping(ip string) (err error) {
 	switch OS := runtime.GOOS; OS {
 	case "windows":
-		err = exec.Command("ping", "-n", "1", ip).Run()
+		proc_ping := exec.Command("ping", "-n", "1", ip)
+		proc_ping.SysProcAttr.HideWindow = true
+		err = proc_ping.Run()
 	case "linux":
 		err = exec.Command("ping", "-c", "1", ip).Run()
 	default:
