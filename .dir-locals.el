@@ -5,7 +5,13 @@
                              #'delete-trailing-whitespace
                              nil "local")))
 
+         (delete-trailing-lines . t)
          (require-final-newline . t)
+
+         (eval . (when buffer-file-name
+                   (when (string-match-p "\\`\\(LICENSE\\|License\\|license\\|COPYING\\)$"
+                                         (file-name-base buffer-file-name))
+                     (setq-local buffer-read-only t))))
 
          (eval . (line-number-mode -1))
          (mode . display-line-numbers)
@@ -24,4 +30,5 @@
 
          (treesit-font-lock-level . 4)))
  (makefile-mode . ((whitespace-style . (face tabs))
-                   (mode . whitespace))))
+                   (mode . whitespace)))
+ (yaml-mode . ((indent-tabs-mode . nil))))
