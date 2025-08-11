@@ -10,9 +10,7 @@ import requests
 
 
 class chaindb_config:
-    DiscoveryInterval = datetime.timedelta(
-        seconds=10
-    )
+    DiscoveryInterval = datetime.timedelta(seconds=10)
     TCPPortUserService = 56784
 
 
@@ -24,9 +22,7 @@ class blockchain:
 
 
 class UserClient:
-    def __init__(
-        self, origin = f"http://localhost:{chaindb_config.TCPPortUserService}"
-    ):
+    def __init__(self, origin=f"http://localhost:{chaindb_config.TCPPortUserService}"):
         self.origin = origin  # const
 
         if self.origin.startswith("http://localhost:"):
@@ -34,9 +30,9 @@ class UserClient:
                 "AMD64",
                 "x86_64",
             }:
-                if os.system("PATH+=: type -P chaindb.x64-linux.exe") == 0:
+                if os.system("bash -c 'PATH+=: type -P chaindb.x64-linux.exe'") == 0:
                     os.system(
-                        "PATH+=: bash -c 'chaindb.x64-linux.exe 2>./chaindb.log.txt &'"
+                        """ bash -c "PATH+=: bash -c 'chaindb.x64-linux.exe 2>./chaindb.log.txt &'" """
                     )
                 else:
                     with requests.get(
@@ -68,7 +64,7 @@ class UserClient:
     def ListOwners(
         self,
         *,
-        confirmations = 0,
+        confirmations=0,
     ):
         resp = requests.get(f"{self.origin}/api/v1/owners")
         if resp.status_code not in range(200, 300):
@@ -95,7 +91,7 @@ class UserClient:
         self,
         owner,
         *,
-        confirmations = 0,
+        confirmations=0,
     ):
         resp = requests.get(f"{self.origin}/api/v1/transactions?owner={owner}")
         if resp.status_code not in range(200, 300):

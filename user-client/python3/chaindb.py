@@ -72,9 +72,9 @@ class UserClient:
                 "AMD64",
                 "x86_64",
             }:
-                if os.system("PATH+=: type -P chaindb.x64-linux.exe") == 0:
+                if os.system("bash -c 'PATH+=: type -P chaindb.x64-linux.exe'") == 0:
                     os.system(
-                        "PATH+=: bash -c 'chaindb.x64-linux.exe 2>./chaindb.log.txt &'"
+                        """ bash -c "PATH+=: bash -c 'chaindb.x64-linux.exe 2>./chaindb.log.txt &'" """
                     )
                 else:
                     with requests.get(

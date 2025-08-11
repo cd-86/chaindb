@@ -1,0 +1,2 @@
+需要安装 requests 库.
+在 Ubuntu 上, 可以用 'apt install -y python3-requests' 安装.
