@@ -14,7 +14,7 @@
                      (setq-local buffer-read-only t))))
          (eval . (when buffer-file-name
                    (when (string-match-p "\\.log\\.txt$"
-                                         (file-name-base buffer-file-name))
+                                         (file-name-nondirectory buffer-file-name))
                      (setq-local buffer-read-only t))))
 
          (eval . (line-number-mode -1))
