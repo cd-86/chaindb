@@ -22,8 +22,6 @@
 
          (sentence-end-double-space . t)
 
-         (mode . rainbow)
-
          (eval . (when buffer-file-name
                    (when (string-match-p "\\.log\\.txt$" buffer-file-name)
                      (auto-revert-tail-mode))))
