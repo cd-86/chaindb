@@ -12,6 +12,10 @@
                    (when (string-match-p "\\`\\(LICENSE\\|License\\|license\\|COPYING\\)$"
                                          (file-name-base buffer-file-name))
                      (setq-local buffer-read-only t))))
+         (eval . (when buffer-file-name
+                   (when (string-match-p "\\.log\\.txt$"
+                                         (file-name-base buffer-file-name))
+                     (setq-local buffer-read-only t))))
 
          (eval . (line-number-mode -1))
          (mode . display-line-numbers)
@@ -22,6 +26,8 @@
 
          (sentence-end-double-space . t)
 
+         (auto-revert-verbose . nil)
+         (auto-revert-avoid-polling . t)
          (eval . (when buffer-file-name
                    (when (string-match-p "\\.log\\.txt$" buffer-file-name)
                      (auto-revert-tail-mode))))
