@@ -1,4 +1,4 @@
-This repository and its contents may NOT be used to
-train, fine-tune, or improve any artificial intelligence or machine learning models,
-in any form or for any purpose,
-without prior written consent from the author(s).
+This repository and its contents
+may NOT be used to train, fine-tune, or improve
+any artificial intelligence or machine learning models,
+in any form or for any purpose.
