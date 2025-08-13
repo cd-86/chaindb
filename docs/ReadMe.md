@@ -141,7 +141,7 @@ Content-Type: application/json
 因此, 网络中的多条链最终只有一条会成为 **主干**.  <br />
 ChainDB 在概率上控制 **主干** 的增长速度为 1.x sec/block (试验中是 1.25), 即 *平均区块时间*.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > 如果出于某些原因, 一个网络分裂成了两个, 那么这两个网络各自的 *平均区块时间* 仍然不变.
 > ChainDB 将任何网络视为独立且平等的, 甚至是单一节点网络.
 
@@ -200,8 +200,15 @@ $$
 > 对于每个数值小于那个 counter 的 counter, 有 $(1-l)$ 的概率被 那个 counter 的值和颜色覆盖.
 >
 > 然后开始下一天.
-> 
+>
 > Question:
 > 我们只查询特定的名为 T 的 counter.
 > 某天早上观察到 T 的值为 $c$ 且它的颜色和自身的初始颜色相同 (可能从未改变, 也可能是被染回去了),
 > 那么 T 和 数值最大的某个 counter 是同色的概率是多少?
+
+ <footer>
+    <small>
+        Copyright &copy; 2025 shynur &lt;<a href='mailto:shynur@outlook.com'>shynur@outlook.com</a>&gt;.
+        All rights reserved.
+    </small>
+</footer>
