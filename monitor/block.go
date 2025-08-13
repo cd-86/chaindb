@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -27,7 +28,7 @@ func blocksHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&blocks)
 	if err != nil {
-		http.Error(w, "无效的 JSON", http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("无效的 JSON (error: %s)", err), http.StatusBadRequest)
 		return
 	}
 

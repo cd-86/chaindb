@@ -309,8 +309,3 @@ if __name__ == "__main__":
                         print(f"\t{'OK' if ok else 'Failed'}")
             except Exception as e:
                 print("Error: ", e, file=sys.stderr)
-
-    def testMonitor():
-        code.interact(local={**locals(), **sys.modules[__name__].__dict__})
-
-    testMonitor()
