@@ -3,6 +3,21 @@
 # 查询区块
 GET http://localhost:56780/blocks/0
 
+
+# 添加区块
+POST http://localhost:56780/blocks
+Content-Type: application/json
+
+[
+    {
+        "Timestamp": 1755063111.6390874,
+        "MinerAddress": "My-Computer",
+        "UUID": 6365100224914178004,
+        "Height": 428066,
+        "ParentUUID": 6038088288916705636
+    }
+]
+
 ################ chain #################
 
 # 查询节点当前正在从哪个区块往后挖矿

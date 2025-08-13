@@ -11,7 +11,37 @@ import (
 )
 
 func registerBlockService(server *http.ServeMux) {
+	server.HandleFunc("/blocks", blocksHandler)
 	server.HandleFunc("/blocks/", getBlocksUUIDHandler)
+}
+
+func blocksHandler(w http.ResponseWriter, r *http.Request) {
+	// POST /blocks
+	// JSON: [block1, ...]
+	if r.Method != http.MethodPost {
+		http.Error(w, "只支持 POST", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var blocks []blockchain.Block
+
+	err := json.NewDecoder(r.Body).Decode(&blocks)
+	if err != nil {
+		http.Error(w, "无效的 JSON", http.StatusBadRequest)
+		return
+	}
+
+	for _, blk := range blocks {
+		_, exists := blockchain.BlockCache.Load(blk.UUID)
+		if exists {
+			continue
+		}
+
+		validator.BlockCacheDetached.Store(
+			blk.UUID,
+			blk,
+		)
+	}
 }
 
 // GET /blocks/[uuid]

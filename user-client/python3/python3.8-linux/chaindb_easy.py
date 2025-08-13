@@ -1,6 +1,9 @@
 import logging
 import functools
 
+# polyfills
+functools.cache = functools.lru_cache(None)
+
 _Logger = logging.getLogger(__name__)
 
 import chaindb
