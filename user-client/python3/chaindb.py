@@ -8,6 +8,7 @@ import os
 import time
 import logging
 import platform
+import code
 import sys
 import subprocess
 import requests
@@ -21,6 +22,7 @@ class chaindb_config:
         seconds=10
     )
     TCPPortUserService: typing.ReadOnly[int] = 56784
+    TCPPortMonitor: typing.ReadOnly[int] = 56780
 
 
 class blockchain:
@@ -28,6 +30,14 @@ class blockchain:
         OwnerID: int
         Nonce: int
         Data: str
+
+    class Block(typing.TypedDict):
+        Timestamp: typing.ReadOnly[float]
+        MinerAddress: typing.ReadOnly[str]
+        UUID: typing.ReadOnly[int]
+        Height: typing.ReadOnly[int]
+        ParentUUID: typing.ReadOnly[int]
+        Transactions: typing.ReadOnly[typing.NotRequired[list]]
 
 
 class UserClient:
@@ -213,48 +223,94 @@ class UserClient:
         return resp.status_code in range(200, 300)
 
 
+class Monitor:
+    def __init__(
+        self, origin: str = f"http://localhost:{chaindb_config.TCPPortMonitor}"
+    ):
+        self.origin: str = origin  # const
+
+        self.blocks_cache: dict[int, blockchain.Block] = {}
+
+    def GetBlock(self, uuid: int) -> blockchain.Block:
+        if uuid in self.blocks_cache:
+            return self.blocks_cache[uuid]
+
+        resp = requests.get(f"{self.origin}/blocks/{uuid}")
+        block = resp.json()
+        _Logger.info(f"获取区块 {block}")
+        self.blocks_cache[uuid] = block
+
+        return self.blocks_cache[uuid]
+
+    def GetHeadBlock(self) -> blockchain.Block:
+        resp = requests.get(f"{self.origin}/head")
+        head = int(resp.json())
+        return self.GetBlock(head)
+
+    def DumpChain(self) -> list[blockchain.Block]:
+        head = self.GetHeadBlock()
+        blocks = [head]
+
+        while blocks[-1]["UUID"]:
+            blocks.append(self.GetBlock(blocks[-1]["ParentUUID"]))
+
+        return blocks
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    uc = UserClient()
+    def testUserClient():
+        uc = UserClient()
 
-    while True:
-        print()
-        try:
-            op = input("Operation (o=列出索引, t=列出数据, i=插入数据): ").strip()
-            match op:
-                case "o":
-                    confirmations = int(
-                        input("(默认是 0) Confirmation Score >= ") or "0"
-                    )
-                    for owner, confirmation in uc.ListOwners(
-                        confirmations=confirmations
-                    ):
-                        print(f"OwnerID: {owner}\tConfirmationScore: {confirmation}")
-                case "t":
-                    owner = int(input("OwnerID="))
-                    confirmations = int(
-                        input("(默认是 0) Confirmation Score >= ") or "0"
-                    )
-                    for transaction, confirmation in sorted(
-                        uc.ListTransactionsOwnedBy(owner, confirmations=confirmations),
-                        key=lambda transaction: transaction.Transaction.Nonce,
-                    ):
-                        print(
-                            f"OwnerID: {transaction.OwnerID}\tNonce: {transaction.Nonce}\tConfirmationScore: {confirmation}{transaction.Data and f'\tData: {transaction.Data}'}"
+        while True:
+            print()
+            try:
+                op = input("Operation (o=列出索引, t=列出数据, i=插入数据): ").strip()
+                match op:
+                    case "o":
+                        confirmations = int(
+                            input("(默认是 0) Confirmation Score >= ") or "0"
                         )
-                case "i":
-                    owner = int(input("OwnerID="))
-                    nonce = int(input("Nonce="))
-                    confirmations = int(
-                        input("(默认是 0) Confirmation Score >= ") or "0"
-                    )
-                    data = input("Data: ")
-                    ok = uc.Insert(
-                        blockchain.Transaction(OwnerID=owner, Nonce=nonce, Data=data),
-                        confirmations=confirmations,
-                    )
-                    print()
-                    print(f"\t{'OK' if ok else 'Failed'}")
-        except Exception as e:
-            print("Error: ", e, file=sys.stderr)
+                        for owner, confirmation in uc.ListOwners(
+                            confirmations=confirmations
+                        ):
+                            print(
+                                f"OwnerID: {owner}\tConfirmationScore: {confirmation}"
+                            )
+                    case "t":
+                        owner = int(input("OwnerID="))
+                        confirmations = int(
+                            input("(默认是 0) Confirmation Score >= ") or "0"
+                        )
+                        for transaction, confirmation in sorted(
+                            uc.ListTransactionsOwnedBy(
+                                owner, confirmations=confirmations
+                            ),
+                            key=lambda transaction: transaction.Transaction.Nonce,
+                        ):
+                            print(
+                                f"OwnerID: {transaction.OwnerID}\tNonce: {transaction.Nonce}\tConfirmationScore: {confirmation}{transaction.Data and f'\tData: {transaction.Data}'}"
+                            )
+                    case "i":
+                        owner = int(input("OwnerID="))
+                        nonce = int(input("Nonce="))
+                        confirmations = int(
+                            input("(默认是 0) Confirmation Score >= ") or "0"
+                        )
+                        data = input("Data: ")
+                        ok = uc.Insert(
+                            blockchain.Transaction(
+                                OwnerID=owner, Nonce=nonce, Data=data
+                            ),
+                            confirmations=confirmations,
+                        )
+                        print()
+                        print(f"\t{'OK' if ok else 'Failed'}")
+            except Exception as e:
+                print("Error: ", e, file=sys.stderr)
+
+    def testMonitor():
+        code.interact(local={**locals(), **sys.modules[__name__].__dict__})
+
+    testMonitor()
