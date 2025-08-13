@@ -32,17 +32,19 @@ func blocksHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, blk := range blocks {
-		_, exists := blockchain.BlockCache.Load(blk.UUID)
-		if exists {
-			continue
-		}
+	go func() {
+		for _, blk := range blocks {
+			_, exists := blockchain.BlockCache.Load(blk.UUID)
+			if exists {
+				continue
+			}
 
-		validator.BlockCacheDetached.Store(
-			blk.UUID,
-			blk,
-		)
-	}
+			validator.BlockCacheDetached.Store(
+				blk.UUID,
+				blk,
+			)
+		}
+	}()
 }
 
 // GET /blocks/[uuid]
