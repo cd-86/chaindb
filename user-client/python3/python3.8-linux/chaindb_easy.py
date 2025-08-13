@@ -56,3 +56,7 @@ def Insert(owner: int, data: str) -> int:
                 return nonce
             _Logger.info("该位置已被其它客户端插入数据, 即将重试...")
             return Insert(owner, data)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
