@@ -9,11 +9,11 @@
          (require-final-newline . t)
 
          (eval . (when buffer-file-name
-                   (when (string-match-p "\\`\\(LICENSE\\|License\\|license\\|COPYING\\)$"
+                   (when (string-match-p "\\`\\(LICENSE\\|License\\|license\\|COPYING\\)\\'"
                                          (file-name-base buffer-file-name))
                      (setq-local buffer-read-only t))))
          (eval . (when buffer-file-name
-                   (when (string-match-p "\\.log\\.txt$"
+                   (when (string-match-p "\\.log\\.txt\\'"
                                          (file-name-nondirectory buffer-file-name))
                      (setq-local buffer-read-only t))))
 
@@ -29,7 +29,7 @@
          (auto-revert-verbose . nil)
          (auto-revert-avoid-polling . t)
          (eval . (when buffer-file-name
-                   (when (string-match-p "\\.log\\.txt$" buffer-file-name)
+                   (when (string-match-p "\\.log\\.txt\\'" buffer-file-name)
                      (auto-revert-tail-mode))))
 
          (treesit-font-lock-level . 4)))
