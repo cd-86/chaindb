@@ -1,5 +1,11 @@
 #! python3.13 -i
 
+import logging
+import functools
+
+_Logger = logging.getLogger(__name__)
+
+
 import chaindb
 
 RequiredConfirmations: int = 10
@@ -8,7 +14,14 @@ RequiredConfirmations: int = 10
 #     延迟 = RequiredConfirmations * 1.25 seconds
 # 该变量可配置, 建议所有节点使用相同的 RequiredConfirmations.
 
-uc = chaindb.UserClient()
+
+@functools.cache
+def _Client():
+    _Logger.info("正在创建 ChainDB 客户端...")
+    uc = chaindb.UserClient()
+    _Logger.info("ChainDB 客户端创建完成")
+    return uc
+
 
 AvailableOwners = range(100_0000, 200_0000)
 # ChainDB 所存储的 key-value pairs 中 key 的可用范围.
@@ -18,7 +31,7 @@ def Owners() -> list[int]:
     """
     获取 ChainDB 里的 keys (也称 owners).
     """
-    owners = uc.ListOwners(confirmations=RequiredConfirmations)
+    owners = _Client().ListOwners(confirmations=RequiredConfirmations)
     return [owner.OwnerID for owner in owners if owner.OwnerID in AvailableOwners]
 
 
@@ -26,7 +39,7 @@ def Get(owner: int) -> list[str]:
     """
     按 owner 获取 value, value 是一个数组, 按插入时间的顺序排列.
     """
-    txs = uc.ListTransactionsOwnedBy(owner, confirmations=RequiredConfirmations)
+    txs = _Client().ListTransactionsOwnedBy(owner, confirmations=RequiredConfirmations)
     txs.sort(key=lambda tx: tx.Transaction.Nonce)
     return [tx.Transaction.Data for tx in txs]
 
@@ -46,7 +59,8 @@ def Insert(owner: int, data: str) -> int:
     nonce = len(Get(owner))
 
     while True:
-        ok = uc.Insert(
+        _Logger.info(f"尝试插入数据到 {owner=} 的索引 {nonce} 处...")
+        ok = _Client().Insert(
             chaindb.blockchain.Transaction(
                 OwnerID=owner,
                 Nonce=nonce,
@@ -60,4 +74,9 @@ def Insert(owner: int, data: str) -> int:
         if len(Get(owner)) > nonce:
             if Get(owner)[nonce] == data:
                 return nonce
+            _Logger.info("该位置已被其它客户端插入数据, 即将重试...")
             return Insert(owner, data)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
