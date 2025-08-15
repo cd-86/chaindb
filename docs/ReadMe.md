@@ -208,7 +208,7 @@ $$
 
  <footer>
     <small>
-        Copyright &copy; 2025 shynur &lt;<a href='mailto:shynur@outlook.com'>shynur@outlook.com</a>&gt;.
+        Copyright &copy; 2025  shynur &lt;<a href='mailto:shynur@outlook.com'>shynur@outlook.com</a>&gt;.
         All rights reserved.
     </small>
 </footer>
